@@ -62,7 +62,7 @@ body[data-accent="red"]  { --accent:#a8362f; --accent-2:#c2534b; }
 
 /* ---------- Base ---------- */
 *{ box-sizing:border-box; }
-html{ scroll-behavior:smooth; }
+html{ scroll-behavior:smooth; overflow-x:hidden; }
 body{
   margin:0;
   font-family:'Manrope',system-ui,sans-serif;
@@ -175,7 +175,19 @@ body[data-motion="off"] .cut-float{ animation:none!important; }
 .nav-links a:hover{ color:var(--text); }
 .nav-cta{ font-family:'Space Grotesk'; font-weight:600; font-size:14px; padding:10px 18px!important; border-radius:13px; color:#fff!important; background:linear-gradient(135deg,var(--accent),var(--accent-2)); box-shadow:3px 3px 9px var(--neu-dark); transition:transform .2s var(--ease)!important; }
 .nav-cta:hover{ transform:translateY(-1px); }
-.nav-burger{ display:none; }
+
+/* mobile hamburger + dropdown menu (shown only <=880px) */
+.nav-burger{ display:none; width:44px; height:44px; border:none; border-radius:13px; background:var(--surface); box-shadow:5px 5px 12px var(--neu-dark), -5px -5px 12px var(--neu-light); cursor:pointer; padding:0; place-items:center; -webkit-tap-highlight-color:transparent; }
+.nav-burger span{ display:block; width:20px; height:2px; border-radius:2px; background:var(--text); margin:2.5px auto; transition:transform .25s var(--ease), opacity .2s var(--ease); }
+.nav-burger:active{ box-shadow:inset 4px 4px 9px var(--neu-dark), inset -4px -4px 9px var(--neu-light); }
+.nav.open .nav-burger span:nth-child(1){ transform:translateY(5px) rotate(45deg); }
+.nav.open .nav-burger span:nth-child(2){ opacity:0; }
+.nav.open .nav-burger span:nth-child(3){ transform:translateY(-5px) rotate(-45deg); }
+.nav-menu{ display:none; flex-direction:column; gap:3px; margin-top:10px; padding:12px; border-radius:18px; }
+.nav-menu a{ font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16px; color:var(--text-soft); padding:13px 16px; border-radius:12px; transition:background .2s, color .2s; }
+.nav-menu a:hover,.nav-menu a:active{ background:rgba(255,255,255,.5); color:var(--text); }
+.nav-menu .nav-menu-cta{ color:#fff; text-align:center; background:linear-gradient(135deg,var(--accent),var(--accent-2)); margin-top:5px; }
+@keyframes menuIn{ from{ opacity:0; transform:translateY(-8px); } to{ opacity:1; transform:none; } }
 
 /* ============================================================ HERO */
 .hero{ position:relative; padding-top:170px; padding-bottom:80px; min-height:100vh; display:flex; align-items:center; }
@@ -311,6 +323,7 @@ footer{ position:relative; z-index:2; padding:40px 0 50px; text-align:center; }
   .proj.span-3,.proj.span-2,.proj.span-4{ grid-column:span 2; }
 }
 @media (max-width:880px){
+  .hero{ padding-top:128px; }
   .hero-grid{ grid-template-columns:1fr; gap:30px; }
   .hero-portrait{ order:-1; }
   .portrait-frame{ width:min(78%,320px); }
@@ -319,15 +332,38 @@ footer{ position:relative; z-index:2; padding:40px 0 50px; text-align:center; }
   .contact-grid{ grid-template-columns:1fr; gap:30px; }
   .nav-links{ display:none; }
   .nav-cta{ display:none; }
+  .nav-burger{ display:grid; }
+  .nav.open .nav-menu{ display:flex; animation:menuIn .25s var(--ease); }
+  .props-layer{ display:none; }            /* declutter hero on phones */
 }
 @media (max-width:560px){
   section{ padding:72px 0; }
+  .hero{ padding-top:104px; padding-bottom:48px; min-height:auto; }
   .proj-grid{ grid-template-columns:1fr; }
   .proj.span-3,.proj.span-2,.proj.span-4{ grid-column:span 1; }
   .skills-grid{ grid-template-columns:1fr; }
   .container{ padding:0 18px; }
-  .contact-card{ padding:40px 26px; }
-  .hero h1{ font-size:clamp(38px,12vw,60px); }
+  .contact-card{ padding:40px 22px; }
+  .contact h2{ font-size:clamp(28px,8vw,40px); }
+  .hero h1{ font-size:clamp(34px,11vw,52px); }
+  .hero p.lede{ font-size:16px; }
+  .portrait-frame{ width:min(84%,280px); }
+  .portrait-tag{ font-size:10px; padding:8px 11px; gap:8px; }
+  .portrait-tag .ic{ width:26px; height:26px; }
+  .pt-1{ left:-8px; } .pt-2{ right:-8px; } .pt-3{ left:-2px; }
+  .about-card{ padding:24px 16px 0; }
+  .about-card img{ height:auto; width:min(74%,250px); }
+  .about-chiprow{ right:-2px; top:18%; }
+  .mini-chip{ font-size:10px; padding:8px 11px; }
+  .hero-cta{ width:100%; }
+  .hero-cta .btn{ flex:1 1 auto; justify-content:center; }
+  .hero-stats{ gap:10px; }
+  .stat{ min-width:0; flex:1 1 30%; padding:14px 14px; }
+  .stat b{ font-size:22px; }
+  .brand b{ font-size:15px; }
+  .brand span span{ display:none; }       /* drop subtitle to save nav width */
+  .proj{ min-height:auto; padding:24px; }
+  .marquee::before,.marquee::after{ width:60px; }
 }
 
 /* hero layout variants (tweak) */
@@ -366,6 +402,16 @@ body[data-hero="minimal"] .hero-grid{ grid-template-columns:1fr; max-width:760px
         <a href="#contact">Contact</a>
       </div>
       <a class="nav-cta" href="#contact">Let's talk</a>
+      <button class="nav-burger" id="navBurger" aria-label="Open menu" aria-controls="navMenu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-menu glass" id="navMenu">
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#work">Work</a>
+      <a href="#contact">Contact</a>
+      <a class="nav-menu-cta" href="#contact">Let's talk</a>
     </div>
   </nav>
 
@@ -650,6 +696,29 @@ body[data-hero="minimal"] .hero-grid{ grid-template-columns:1fr; max-width:760px
         ri = (ri + 1) % roles.length;
         roles[ri].classList.add("on");
       }, 2300);
+    }
+
+    /* ---- Mobile hamburger menu ---- */
+    var burger = document.getElementById("navBurger");
+    var nav = document.querySelector(".nav");
+    if (burger && nav) {
+      burger.addEventListener("click", function () {
+        var open = nav.classList.toggle("open");
+        burger.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+      Array.prototype.forEach.call(nav.querySelectorAll(".nav-menu a"), function (a) {
+        a.addEventListener("click", function () {
+          nav.classList.remove("open");
+          burger.setAttribute("aria-expanded", "false");
+        });
+      });
+      /* close the menu if the viewport grows back to desktop */
+      window.addEventListener("resize", function () {
+        if (window.innerWidth > 880 && nav.classList.contains("open")) {
+          nav.classList.remove("open");
+          burger.setAttribute("aria-expanded", "false");
+        }
+      });
     }
 
     /* ---- Scroll reveal (IntersectionObserver, same thresholds) ---- */
