@@ -7,12 +7,12 @@ step**: it's one HTML file with inline CSS and a few lines of vanilla JS.
 
 ## View it
 
-Open [`Portfolio.html`](Portfolio.html) in any modern browser — that's it.
+Open [`index.html`](index.html) in any modern browser — that's it.
 
 ## Structure
 
 ```
-Portfolio.html      The whole site (HTML + inline CSS + vanilla JS)
+index.html          The whole site (HTML + inline CSS + vanilla JS)
 assets/
   person/           Portrait cutouts (waving, laptop)
   props/            Retro-tech decorative props (Game Boy, robot arm, cameras…)
