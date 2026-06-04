@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hussein Alsaadi — IoT Engineer & Developer</title>
+<meta name="description" content="Hussein Alsaadi — Mobile Communications & Computing Engineer. IoT, embedded systems, Flutter & full-stack web." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<style>
+/* ============================================================
+   Hussein Alsaadi — Portfolio
+   Neumorphism (warm cream) + Glassmorphism design system
+   ============================================================ */
+
+/* ---------- Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+/* ---------- Tokens ---------- */
+:root{
+  --bg:        #e9e1d3;
+  --bg-deep:   #e2d9c9;
+  --surface:   #e9e1d3;     /* neumorphism needs surface == bg */
+  --text:      #322c21;
+  --text-soft: #6c6353;
+  --text-mute: #9a9180;
+
+  --green:  #33503f;
+  --green-2:#436a52;
+  --gold:   #b3852f;
+  --gold-2: #caa14a;
+  --red:    #b23b34;
+
+  --accent:    var(--green);
+  --accent-2:  var(--green-2);
+
+  /* neumorphism shadow pair */
+  --neu-light: #fbf5ea;
+  --neu-dark:  #c8bca4;
+
+  --glass-bg:    linear-gradient(135deg, rgba(255,253,248,.62), rgba(255,253,248,.26));
+  --glass-brd:   rgba(255,255,255,.65);
+  --glass-shadow:0 14px 40px rgba(86,74,52,.16);
+
+  --r-lg: 30px;
+  --r-md: 22px;
+  --r-sm: 14px;
+
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --maxw: 1200px;
+  --reveal: 1; /* multiplied into transitions; set 0 to disable motion */
+}
+
+/* background variants (tweakable) */
+body[data-bg="sand"]{ --bg:#ece2cf; --bg-deep:#e4d8c0; --surface:#ece2cf; --neu-light:#fdf7e9; --neu-dark:#cabd9f; }
+body[data-bg="sage"]{ --bg:#e3e5da; --bg-deep:#dadcce; --surface:#e3e5da; --neu-light:#f4f6ec; --neu-dark:#bfc3b2; --text:#2b2f27; --text-soft:#5f6557; }
+
+/* accent variants (tweakable) */
+body[data-accent="green"]{ --accent:#33503f; --accent-2:#436a52; }
+body[data-accent="gold"] { --accent:#a9791f; --accent-2:#c39a3c; }
+body[data-accent="red"]  { --accent:#a8362f; --accent-2:#c2534b; }
+
+/* ---------- Base ---------- */
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  font-family:'Manrope',system-ui,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  line-height:1.55;
+}
+h1,h2,h3,h4{ font-family:'Space Grotesk',sans-serif; font-weight:600; line-height:1.05; margin:0; letter-spacing:-.01em; }
+a{ color:inherit; text-decoration:none; }
+.mono{ font-family:'JetBrains Mono',monospace; }
+
+/* ambient gradient blobs (behind glass) */
+.ambient{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.blob{ position:absolute; border-radius:50%; filter:blur(70px); opacity:.5; animation:drift 22s var(--ease) infinite alternate; }
+.blob.b1{ width:46vw;height:46vw; left:-12vw;top:-10vw; background:radial-gradient(circle,#4a7058,transparent 68%); }
+.blob.b2{ width:40vw;height:40vw; right:-12vw;top:18vh;  background:radial-gradient(circle,#d9b256,transparent 68%); animation-duration:28s; }
+.blob.b3{ width:38vw;height:38vw; left:18vw;bottom:-16vw; background:radial-gradient(circle,#c0655b,transparent 70%); opacity:.34; animation-duration:32s; }
+@keyframes drift{ from{ transform:translate(0,0) scale(1); } to{ transform:translate(5vw,4vh) scale(1.12); } }
+
+/* grain/noise veil for warmth */
+.ambient::after{
+  content:""; position:absolute; inset:0;
+  background-image:radial-gradient(rgba(120,100,70,.05) 1px, transparent 1px);
+  background-size:4px 4px; opacity:.5;
+}
+
+/* ---------- Neumorphism utilities ---------- */
+.neu{
+  background:var(--surface);
+  border-radius:var(--r-md);
+  box-shadow:9px 9px 20px var(--neu-dark), -9px -9px 20px var(--neu-light);
+}
+.neu-sm{ border-radius:var(--r-sm); box-shadow:5px 5px 12px var(--neu-dark), -5px -5px 12px var(--neu-light); background:var(--surface); }
+.neu-inset{
+  background:var(--surface);
+  border-radius:var(--r-md);
+  box-shadow:inset 7px 7px 15px var(--neu-dark), inset -7px -7px 15px var(--neu-light);
+}
+.neu-press{ transition:box-shadow .18s var(--ease), transform .18s var(--ease); }
+.neu-press:active{ box-shadow:inset 5px 5px 12px var(--neu-dark), inset -5px -5px 12px var(--neu-light); transform:translateY(1px); }
+
+/* ---------- Glassmorphism utilities ---------- */
+.glass{
+  background:var(--glass-bg);
+  backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
+  border:1px solid var(--glass-brd);
+  border-radius:var(--r-md);
+  box-shadow:var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,.7);
+}
+.glass-deep{
+  background:linear-gradient(135deg, rgba(255,253,248,.5), rgba(255,253,248,.18));
+  backdrop-filter:blur(26px) saturate(160%);
+  -webkit-backdrop-filter:blur(26px) saturate(160%);
+  border:1px solid rgba(255,255,255,.55);
+  border-radius:var(--r-lg);
+  box-shadow:0 22px 60px rgba(70,58,38,.2), inset 0 1px 0 rgba(255,255,255,.65);
+}
+
+/* ---------- Layout ---------- */
+.wrap{ position:relative; z-index:2; }
+.container{ width:100%; max-width:var(--maxw); margin:0 auto; padding:0 28px; }
+section{ position:relative; padding:104px 0; }
+.kicker{
+  font-family:'JetBrains Mono',monospace; font-size:12.5px; letter-spacing:.32em;
+  text-transform:uppercase; color:var(--accent); font-weight:500;
+  display:inline-flex; align-items:center; gap:10px;
+}
+.kicker::before{ content:""; width:26px; height:2px; background:var(--accent); border-radius:2px; opacity:.7; }
+.section-head{ max-width:640px; margin-bottom:54px; }
+.section-head h2{ font-size:clamp(30px,4.4vw,50px); margin:18px 0 14px; }
+.section-head p{ color:var(--text-soft); font-size:17px; margin:0; }
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex; align-items:center; gap:10px; cursor:pointer;
+  font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px;
+  padding:15px 26px; border-radius:16px; border:none; color:var(--text);
+  background:var(--surface);
+  box-shadow:6px 6px 14px var(--neu-dark), -6px -6px 14px var(--neu-light);
+  transition:transform .2s var(--ease), box-shadow .2s var(--ease), color .2s;
+}
+.btn:hover{ transform:translateY(-2px); box-shadow:8px 9px 18px var(--neu-dark), -8px -9px 18px var(--neu-light); }
+.btn:active{ box-shadow:inset 5px 5px 11px var(--neu-dark), inset -5px -5px 11px var(--neu-light); transform:translateY(0); }
+.btn-primary{ color:#fff; background:linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow:6px 6px 16px var(--neu-dark), -5px -5px 12px var(--neu-light); }
+.btn-primary:hover{ box-shadow:8px 10px 22px rgba(60,50,30,.28), -5px -5px 12px var(--neu-light); }
+.btn .ar{ transition:transform .2s var(--ease); display:inline-flex; }
+.btn:hover .ar{ transform:translateX(4px); }
+
+/* ---------- Reveal animation ---------- */
+.reveal{ opacity:0; transform:translateY(30px); transition:opacity .8s var(--ease), transform .8s var(--ease); }
+.reveal.in{ opacity:1; transform:none; }
+@media (prefers-reduced-motion:reduce){ .reveal{ opacity:1; transform:none; transition:none; } .blob{ animation:none; } }
+body[data-motion="off"] .reveal{ opacity:1!important; transform:none!important; transition:none!important; }
+body[data-motion="off"] .blob,
+body[data-motion="off"] .float-prop,
+body[data-motion="off"] .cut-float{ animation:none!important; }
+
+/* ============================================================ NAV */
+.nav{ position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:50; width:calc(100% - 40px); max-width:var(--maxw); }
+.nav-inner{ display:flex; align-items:center; justify-content:space-between; padding:11px 14px 11px 20px; border-radius:20px; }
+.brand{ display:flex; align-items:center; gap:12px; font-family:'Space Grotesk',sans-serif; font-weight:700; }
+.brand .mark{ width:38px;height:38px; border-radius:12px; display:grid; place-items:center; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:15px; color:#fff; background:linear-gradient(135deg,var(--accent),var(--accent-2)); box-shadow:3px 3px 8px var(--neu-dark), -3px -3px 8px var(--neu-light); }
+.brand b{ font-size:16px; letter-spacing:-.01em; }
+.brand span{ display:block; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; color:var(--text-mute); font-weight:400; text-transform:uppercase; }
+.nav-links{ display:flex; align-items:center; gap:4px; }
+.nav-links a{ font-size:14px; font-weight:600; color:var(--text-soft); padding:9px 15px; border-radius:11px; transition:color .2s, background .2s; }
+.nav-links a:hover{ color:var(--text); }
+.nav-cta{ font-family:'Space Grotesk'; font-weight:600; font-size:14px; padding:10px 18px!important; border-radius:13px; color:#fff!important; background:linear-gradient(135deg,var(--accent),var(--accent-2)); box-shadow:3px 3px 9px var(--neu-dark); transition:transform .2s var(--ease)!important; }
+.nav-cta:hover{ transform:translateY(-1px); }
+.nav-burger{ display:none; }
+
+/* ============================================================ HERO */
+.hero{ position:relative; padding-top:170px; padding-bottom:80px; min-height:100vh; display:flex; align-items:center; }
+.hero-grid{ display:grid; grid-template-columns:1.15fr .85fr; gap:50px; align-items:center; width:100%; }
+.hero-badge{ display:inline-flex; align-items:center; gap:9px; padding:9px 16px; border-radius:30px; font-family:'JetBrains Mono'; font-size:12px; font-weight:500; color:var(--text-soft); margin-bottom:26px; }
+.hero-badge .dot{ width:8px;height:8px;border-radius:50%; background:#3fa46a; box-shadow:0 0 0 0 rgba(63,164,106,.6); animation:pulse 2.4s infinite; }
+@keyframes pulse{ 0%{box-shadow:0 0 0 0 rgba(63,164,106,.5);} 70%{box-shadow:0 0 0 9px rgba(63,164,106,0);} 100%{box-shadow:0 0 0 0 rgba(63,164,106,0);} }
+.hero h1{ font-size:clamp(40px,6.4vw,82px); font-weight:700; letter-spacing:-.025em; }
+.hero h1 .stroke{ background:linear-gradient(135deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero .role-line{ height:1.5em; margin-top:18px; font-family:'JetBrains Mono'; font-size:clamp(15px,1.7vw,19px); color:var(--text-soft); display:flex; align-items:center; gap:12px; }
+.role-rot{ position:relative; display:inline-block; min-width:1ch; }
+.role-rot span{ position:absolute; left:0; white-space:nowrap; color:var(--accent); font-weight:500; opacity:0; transform:translateY(8px); transition:opacity .5s, transform .5s; }
+.role-rot span.on{ opacity:1; transform:none; position:relative; }
+.hero p.lede{ margin:26px 0 32px; font-size:17.5px; color:var(--text-soft); max-width:480px; }
+.hero-cta{ display:flex; gap:14px; flex-wrap:wrap; }
+.hero-stats{ display:flex; gap:14px; margin-top:40px; flex-wrap:wrap; }
+.stat{ padding:16px 22px; border-radius:18px; min-width:104px; }
+.stat b{ display:block; font-family:'Space Grotesk'; font-size:26px; font-weight:700; color:var(--text); }
+.stat small{ font-family:'JetBrains Mono'; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-mute); }
+
+/* hero portrait */
+.hero-portrait{ position:relative; display:flex; justify-content:center; align-items:flex-end; }
+.portrait-frame{ position:relative; width:min(94%,380px); aspect-ratio:3/4.1; border-radius:var(--r-lg); display:flex; align-items:flex-end; justify-content:center; overflow:visible; }
+.portrait-frame .disc{ position:absolute; inset:auto 0 8% 0; height:64%; border-radius:50% 50% 46% 46%/60% 60% 40% 40%; background:linear-gradient(160deg,rgba(255,255,255,.5),rgba(255,255,255,.12)); }
+.portrait-frame img.me{ position:relative; z-index:3; height:108%; width:auto; object-fit:contain; filter:drop-shadow(0 26px 30px rgba(60,48,30,.3)); animation:cutfloat 6s var(--ease) infinite alternate; }
+.cut-float, .portrait-frame img.me{ will-change:transform; }
+@keyframes cutfloat{ from{ transform:translateY(0); } to{ transform:translateY(-14px); } }
+.portrait-tag{ position:absolute; z-index:5; padding:11px 15px; border-radius:14px; display:flex; align-items:center; gap:10px; font-family:'JetBrains Mono'; font-size:11.5px; font-weight:500; }
+.portrait-tag .ic{ width:30px;height:30px;border-radius:9px; display:grid;place-items:center; background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff; }
+.pt-1{ left:-26px; top:16%; animation:cutfloat 5s var(--ease) infinite alternate; }
+.pt-2{ right:-22px; top:46%; animation:cutfloat 7s var(--ease) infinite alternate-reverse; }
+.pt-3{ left:-10px; bottom:9%; animation:cutfloat 6.5s var(--ease) infinite alternate; }
+
+/* ---------- Floating props (decorative) ---------- */
+.props-layer{ position:absolute; inset:0; z-index:1; pointer-events:none; }
+.float-prop{ position:absolute; opacity:.92; filter:drop-shadow(0 14px 20px rgba(60,48,30,.22)); animation:floaty 9s var(--ease) infinite alternate; }
+.float-prop img{ display:block; width:100%; height:auto; }
+@keyframes floaty{ from{ transform:translateY(0) rotate(var(--rot,0deg)); } to{ transform:translateY(-22px) rotate(calc(var(--rot,0deg) + 4deg)); } }
+body[data-density="subtle"] .float-prop{ opacity:.5; }
+body[data-density="subtle"] .float-prop.extra{ display:none; }
+
+/* ============================================================ MARQUEE */
+.marquee{ padding:30px 0; overflow:hidden; position:relative; }
+.marquee-track{ display:flex; gap:54px; width:max-content; animation:scroll 26s linear infinite; align-items:center; }
+.marquee:hover .marquee-track{ animation-play-state:paused; }
+.marquee-track .mq{ font-family:'Space Grotesk'; font-weight:600; font-size:clamp(20px,2.6vw,30px); color:var(--text); opacity:.32; white-space:nowrap; display:flex; align-items:center; gap:54px; }
+.marquee-track .mq::after{ content:"\25C6"; color:var(--accent); font-size:14px; opacity:.8; }
+@keyframes scroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+.marquee::before,.marquee::after{ content:""; position:absolute; top:0; bottom:0; width:120px; z-index:2; pointer-events:none; }
+.marquee::before{ left:0; background:linear-gradient(90deg,var(--bg),transparent); }
+.marquee::after{ right:0; background:linear-gradient(270deg,var(--bg),transparent); }
+
+/* ============================================================ ABOUT */
+.about-grid{ display:grid; grid-template-columns:.9fr 1.1fr; gap:56px; align-items:center; }
+.about-visual{ position:relative; display:flex; justify-content:center; }
+.about-card{ position:relative; width:min(100%,400px); padding:30px 30px 0; border-radius:var(--r-lg); display:flex; flex-direction:column; align-items:center; }
+.about-card .glow{ position:absolute; inset:18% 14% 0 14%; border-radius:50%; background:radial-gradient(circle,rgba(74,112,88,.4),transparent 65%); filter:blur(30px); }
+.about-card img{ position:relative; z-index:2; width:auto; height:430px; object-fit:contain; filter:drop-shadow(0 18px 22px rgba(60,48,30,.28)); }
+.about-chiprow{ position:absolute; z-index:4; right:-12px; display:flex; flex-direction:column; gap:12px; top:24%; }
+.mini-chip{ padding:10px 14px; border-radius:13px; font-family:'JetBrains Mono'; font-size:11px; font-weight:500; display:flex; align-items:center; gap:8px; }
+.mini-chip .d{ width:7px;height:7px;border-radius:50%; }
+.about-body p{ color:var(--text-soft); font-size:17px; margin:0 0 18px; }
+.about-body h2{ font-size:clamp(28px,3.8vw,44px); margin-bottom:20px; }
+.about-body .lead{ color:var(--text); font-weight:500; font-size:19px; }
+.about-pills{ display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; }
+.pill{ padding:9px 16px; border-radius:30px; font-size:13px; font-weight:600; font-family:'JetBrains Mono'; color:var(--text-soft); }
+
+/* ============================================================ SKILLS */
+.skills-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:22px; }
+.skill-card{ padding:26px 24px; border-radius:var(--r-md); position:relative; overflow:hidden; transition:transform .3s var(--ease); }
+.skill-card:hover{ transform:translateY(-6px); }
+.skill-icon{ width:66px;height:66px; border-radius:18px; display:grid; place-items:center; margin-bottom:20px; position:relative; }
+.skill-icon img{ width:42px;height:42px; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(60,48,30,.25)); }
+.skill-card h3{ font-size:19px; margin-bottom:6px; }
+.skill-card .role{ font-family:'JetBrains Mono'; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; display:block; }
+.skill-card ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; }
+.skill-card li{ font-size:13.5px; color:var(--text-soft); display:flex; align-items:center; gap:9px; }
+.skill-card li::before{ content:""; width:5px;height:5px; border-radius:50%; background:var(--accent); flex:none; }
+
+/* ============================================================ PROJECTS */
+.proj-grid{ display:grid; grid-template-columns:repeat(6,1fr); gap:24px; }
+.proj{ border-radius:var(--r-lg); padding:28px; position:relative; overflow:hidden; cursor:pointer; transition:transform .35s var(--ease), box-shadow .35s var(--ease); display:flex; flex-direction:column; min-height:280px; }
+.proj:hover{ transform:translateY(-8px); }
+.proj.span-3{ grid-column:span 3; }
+.proj.span-2{ grid-column:span 2; }
+.proj.span-4{ grid-column:span 4; }
+.proj .pnum{ font-family:'JetBrains Mono'; font-size:11px; letter-spacing:.2em; color:var(--text-mute); }
+.proj .ptype{ font-family:'JetBrains Mono'; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; font-weight:500; padding:6px 11px; border-radius:20px; display:inline-flex; align-items:center; gap:7px; }
+.proj .ptop{ display:flex; justify-content:space-between; align-items:center; margin-bottom:auto; }
+.proj h3{ font-size:clamp(20px,2.2vw,27px); margin:30px 0 12px; max-width:90%; }
+.proj p{ color:var(--text-soft); font-size:14.5px; margin:0 0 20px; max-width:46ch; }
+.proj .tags{ display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; }
+.proj .tag{ font-family:'JetBrains Mono'; font-size:11px; padding:6px 11px; border-radius:9px; color:var(--text-soft); background:rgba(255,255,255,.4); border:1px solid rgba(255,255,255,.5); }
+.proj .pprop{ position:absolute; right:-16px; bottom:-16px; width:120px; opacity:.85; pointer-events:none; transition:transform .4s var(--ease); filter:drop-shadow(0 12px 16px rgba(60,48,30,.22));
+  -webkit-mask-image:radial-gradient(135% 135% at 100% 100%, #000 42%, rgba(0,0,0,.35) 66%, transparent 82%);
+  mask-image:radial-gradient(135% 135% at 100% 100%, #000 42%, rgba(0,0,0,.35) 66%, transparent 82%); }
+.proj.span-2 .pprop{ width:96px; }
+.proj.span-3 .pprop,.proj.span-4 .pprop{ width:128px; }
+.proj:hover .pprop{ transform:scale(1.07) rotate(-5deg) translateY(-6px); }
+.proj .arrow{ position:absolute; top:26px; right:26px; width:38px;height:38px; border-radius:11px; display:grid; place-items:center; opacity:0; transform:translate(-6px,6px); transition:.3s var(--ease); }
+.proj:hover .arrow{ opacity:1; transform:none; }
+.proj .arabic{ direction:rtl; font-family:'Space Grotesk',sans-serif; }
+
+/* card style emphasis (tweak) */
+body[data-cards="neu"] .proj{ background:var(--surface); border:none; box-shadow:9px 9px 22px var(--neu-dark), -9px -9px 22px var(--neu-light); }
+body[data-cards="neu"] .proj .tag{ background:var(--surface); border:none; box-shadow:inset 2px 2px 5px var(--neu-dark), inset -2px -2px 5px var(--neu-light); }
+
+/* ============================================================ CONTACT */
+.contact{ padding-bottom:60px; }
+.contact-card{ border-radius:var(--r-lg); padding:60px 56px; position:relative; overflow:hidden; }
+.contact-grid{ display:grid; grid-template-columns:1.1fr .9fr; gap:50px; align-items:center; }
+.contact h2{ font-size:clamp(32px,4.6vw,56px); margin-bottom:18px; }
+.contact p{ color:var(--text-soft); font-size:17px; max-width:40ch; margin:0 0 28px; }
+.contact-links{ display:flex; flex-direction:column; gap:14px; }
+.clink{ display:flex; align-items:center; gap:16px; padding:16px 20px; border-radius:16px; transition:transform .2s var(--ease); }
+.clink:hover{ transform:translateX(6px); }
+.clink .ic{ width:46px;height:46px; border-radius:13px; display:grid; place-items:center; color:#fff; background:linear-gradient(135deg,var(--accent),var(--accent-2)); flex:none; }
+.clink small{ display:block; font-family:'JetBrains Mono'; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-mute); }
+.clink b{ font-family:'Space Grotesk'; font-weight:600; font-size:15px; word-break:break-all; }
+
+/* ============================================================ FOOTER */
+footer{ position:relative; z-index:2; padding:40px 0 50px; text-align:center; }
+.foot-inner{ display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; }
+.foot-inner .mono{ font-size:12px; color:var(--text-mute); letter-spacing:.06em; }
+
+/* SVG icon sizing */
+.svgic{ width:20px; height:20px; }
+
+/* ============================================================ RESPONSIVE */
+@media (max-width:1040px){
+  .skills-grid{ grid-template-columns:repeat(2,1fr); }
+  .proj-grid{ grid-template-columns:repeat(4,1fr); }
+  .proj.span-3,.proj.span-2,.proj.span-4{ grid-column:span 2; }
+}
+@media (max-width:880px){
+  .hero-grid{ grid-template-columns:1fr; gap:30px; }
+  .hero-portrait{ order:-1; }
+  .portrait-frame{ width:min(78%,320px); }
+  .about-grid{ grid-template-columns:1fr; gap:36px; }
+  .about-visual{ order:-1; }
+  .contact-grid{ grid-template-columns:1fr; gap:30px; }
+  .nav-links{ display:none; }
+  .nav-cta{ display:none; }
+}
+@media (max-width:560px){
+  section{ padding:72px 0; }
+  .proj-grid{ grid-template-columns:1fr; }
+  .proj.span-3,.proj.span-2,.proj.span-4{ grid-column:span 1; }
+  .skills-grid{ grid-template-columns:1fr; }
+  .container{ padding:0 18px; }
+  .contact-card{ padding:40px 26px; }
+  .hero h1{ font-size:clamp(38px,12vw,60px); }
+}
+
+/* hero layout variants (tweak) */
+body[data-hero="centered"] .hero-grid{ grid-template-columns:1fr; text-align:center; justify-items:center; }
+body[data-hero="centered"] .hero-portrait{ order:-1; margin-bottom:10px; }
+body[data-hero="centered"] .hero .role-line,
+body[data-hero="centered"] .hero-cta,
+body[data-hero="centered"] .hero-stats{ justify-content:center; }
+body[data-hero="centered"] .hero p.lede{ margin-left:auto; margin-right:auto; }
+body[data-hero="centered"] .hero-badge{ margin-left:auto; margin-right:auto; }
+
+body[data-hero="minimal"] .hero-portrait{ opacity:0; pointer-events:none; }
+body[data-hero="minimal"] .hero-grid{ grid-template-columns:1fr; max-width:760px; }
+</style>
+</head>
+<body data-hero="split" data-accent="green" data-bg="cream" data-cards="glass" data-density="lively" data-motion="on">
+
+  <!-- ambient gradient blobs -->
+  <div class="ambient">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+  </div>
+
+  <!-- ============================ NAV ============================ -->
+  <nav class="nav">
+    <div class="nav-inner glass">
+      <a class="brand" href="#top">
+        <span class="mark">HA</span>
+        <span><b>Hussein Alsaadi</b><span>ENGINEER &middot; IOT &middot; DEV</span></span>
+      </a>
+      <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#work">Work</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <a class="nav-cta" href="#contact">Let's talk</a>
+    </div>
+  </nav>
+
+  <main class="wrap">
+
+    <!-- ============================ HERO ============================ -->
+    <header class="hero container" id="top">
+      <!-- floating decorative props (anchored to hero) -->
+      <div class="props-layer">
+        <div class="float-prop" style="top:13%; right:2%; width:122px; --rot:-8deg; animation-delay:0s; animation-duration:8s;">
+          <img src="assets/props/gameboy.png" alt="" />
+        </div>
+        <div class="float-prop extra" style="bottom:7%; right:3%; width:82px; --rot:8deg; animation-delay:.7s; animation-duration:9s;">
+          <img src="assets/props/cartridges.png" alt="" />
+        </div>
+      </div>
+
+      <div class="hero-grid">
+        <div class="hero-text reveal">
+          <div class="hero-badge neu-sm"><span class="dot"></span> Available for new projects</div>
+          <h1>Engineering<br/>the <span class="stroke">connected</span><br/>world.</h1>
+          <div class="role-line">
+            <span class="mono">&gt;</span>
+            <span class="role-rot" id="roleRot">
+              <span class="on">IoT Engineer</span>
+              <span>Flutter Developer</span>
+              <span>Web Solutions</span>
+              <span>Embedded Systems</span>
+            </span>
+          </div>
+          <p class="lede">I build connected systems end to end — from the sensor and the solder joint to the mobile app in your hand. IoT, embedded firmware, Flutter apps, and full-stack web.</p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#work">View my work <span class="ar"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+            <a class="btn neu-press" href="#contact">Get in touch</a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat neu-sm reveal" style="transition-delay:0.1s"><b>7+</b><small>Shipped Projects</small></div>
+            <div class="stat neu-sm reveal" style="transition-delay:0.18s"><b>IoT</b><small>Hardware &rarr; Cloud</small></div>
+            <div class="stat neu-sm reveal" style="transition-delay:0.26s"><b>Flutter</b><small>Cross-platform</small></div>
+          </div>
+        </div>
+        <div class="hero-portrait reveal" style="transition-delay:0.15s">
+          <div class="portrait-frame glass-deep">
+            <div class="disc"></div>
+            <img class="me" src="assets/person/waving.png" alt="Hussein Alsaadi" />
+            <div class="portrait-tag pt-1 glass"><span class="ic"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 7V3M14 7V3M10 21v-4M14 21v-4M7 10H3M7 14H3M21 10h-4M21 14h-4"/></svg></span> ESP32</div>
+            <div class="portrait-tag pt-2 glass"><span class="ic"><svg class="svgic" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5z"/></svg></span> Flutter</div>
+            <div class="portrait-tag pt-3 glass"><span class="ic"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6M16 6l5 6-5 6"/></svg></span> Full-Stack</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============================ MARQUEE ============================ -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span class="mq">IoT</span><span class="mq">Flutter</span><span class="mq">Arduino</span><span class="mq">ESP32</span><span class="mq">Embedded</span><span class="mq">Robotics</span><span class="mq">Machine Learning</span><span class="mq">Full-Stack</span><span class="mq">Firmware</span><span class="mq">MQTT</span><span class="mq">IoT</span><span class="mq">Flutter</span><span class="mq">Arduino</span><span class="mq">ESP32</span><span class="mq">Embedded</span><span class="mq">Robotics</span><span class="mq">Machine Learning</span><span class="mq">Full-Stack</span><span class="mq">Firmware</span><span class="mq">MQTT</span>
+      </div>
+    </div>
+
+    <!-- ============================ ABOUT ============================ -->
+    <section id="about" class="container">
+      <div class="about-grid">
+        <div class="about-visual reveal">
+          <div class="about-card glass-deep">
+            <div class="glow"></div>
+            <img src="assets/person/laptop.png" alt="Hussein with laptop" />
+            <div class="about-chiprow">
+              <div class="mini-chip neu-sm"><span class="d" style="background:#3fa46a"></span> Building</div>
+              <div class="mini-chip neu-sm"><span class="d" style="background:#b3852f"></span> Shipping</div>
+              <div class="mini-chip neu-sm"><span class="d" style="background:#b23b34"></span> Iterating</div>
+            </div>
+          </div>
+        </div>
+        <div class="about-body reveal" style="transition-delay:0.1s">
+          <div class="kicker">About me</div>
+          <h2>Engineer at heart,<br/>builder by trade.</h2>
+          <p class="lead">I'm Hussein — a Mobile Communications &amp; Computing Engineer who lives in the space between hardware and software.</p>
+          <p>From wiring up an ESP32 to reading a fuel sensor, to shipping the Flutter app that visualises it, to standing up the ERP that runs a business — I enjoy owning the whole stack. I like problems that touch the physical world: robotics, IoT, sustainable systems, and the occasional health-data model.</p>
+          <div class="about-pills">
+            <span class="pill neu-sm">Embedded C/C++</span>
+            <span class="pill neu-sm">Flutter &middot; Dart</span>
+            <span class="pill neu-sm">React</span>
+            <span class="pill neu-sm">Python &middot; ML</span>
+            <span class="pill neu-sm">Arduino</span>
+            <span class="pill neu-sm">IoT Architecture</span>
+            <span class="pill neu-sm">UI/UX</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ SKILLS ============================ -->
+    <section id="skills" class="container">
+      <div class="section-head reveal">
+        <div class="kicker">What I do</div>
+        <h2>Four disciplines,<br/>one engineer.</h2>
+        <p>I move fluidly across the stack — pairing low-level embedded work with polished, human-facing apps.</p>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-card glass reveal" style="transition-delay:0s">
+          <div class="skill-icon neu-sm"><img src="assets/props/microchip.png" alt="" /></div>
+          <span class="role">Hardware &rarr; Cloud</span>
+          <h3>Embedded &amp; IoT</h3>
+          <ul><li>ESP32 / Arduino firmware</li><li>Sensor networks &amp; MQTT</li><li>PCB &amp; circuit prototyping</li><li>Real-time telemetry</li></ul>
+        </div>
+        <div class="skill-card glass reveal" style="transition-delay:0.08s">
+          <div class="skill-icon neu-sm"><img src="assets/props/gameboy.png" alt="" /></div>
+          <span class="role">Flutter &middot; Dart</span>
+          <h3>Mobile Apps</h3>
+          <ul><li>Flutter &amp; Dart</li><li>Cross-platform builds</li><li>Firebase / REST APIs</li><li>Clean state management</li></ul>
+        </div>
+        <div class="skill-card glass reveal" style="transition-delay:0.16s">
+          <div class="skill-icon neu-sm"><img src="assets/props/floppy1.png" alt="" /></div>
+          <span class="role">Full-Stack</span>
+          <h3>Web &amp; ERP</h3>
+          <ul><li>React front-ends</li><li>Node &amp; API design</li><li>ERP / dashboard systems</li><li>Responsive UI</li></ul>
+        </div>
+        <div class="skill-card glass reveal" style="transition-delay:0.24s">
+          <div class="skill-icon neu-sm"><img src="assets/props/camera1.png" alt="" /></div>
+          <span class="role">ML &middot; Pipelines</span>
+          <h3>Data &amp; Vision</h3>
+          <ul><li>ML prediction pipelines</li><li>Health-risk modelling</li><li>Data engineering</li><li>Computer vision</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ WORK ============================ -->
+    <section id="work" class="container">
+      <div class="section-head reveal">
+        <div class="kicker">Selected work</div>
+        <h2>Things I've built.</h2>
+        <p>Seven projects across IoT, robotics, mobile, data and the web — hardware that talks to software that talks to people.</p>
+      </div>
+      <div class="proj-grid">
+
+        <article class="proj glass span-3 reveal" style="transition-delay:0s">
+          <div class="ptop">
+            <span class="pnum">PROJECT / 01</span>
+            <span class="ptype" style="color:#33503f; background:rgba(255,255,255,.45); border:1px solid rgba(255,255,255,.5)">IoT &middot; Flutter</span>
+          </div>
+          <div class="arrow neu-sm"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <h3>Fuel Tank Monitoring System</h3>
+          <p>Real-time fuel-level telemetry — ESP32 sensors stream to a Flutter dashboard with consumption analytics, low-level alerts, and leak detection.</p>
+          <div class="tags"><span class="tag">ESP32</span><span class="tag">Flutter</span><span class="tag">MQTT</span><span class="tag">Realtime</span></div>
+          <img class="pprop" src="assets/props/microchip.png" alt="" />
+        </article>
+
+        <article class="proj glass span-3 reveal" style="transition-delay:0.08s">
+          <div class="ptop">
+            <span class="pnum">PROJECT / 04</span>
+            <span class="ptype" style="color:#436a52; background:rgba(255,255,255,.45); border:1px solid rgba(255,255,255,.5)">Robotics &middot; Embedded</span>
+          </div>
+          <div class="arrow neu-sm"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <h3>6-DOF Robotic Arm</h3>
+          <p>A Bluetooth-controlled six-axis arm with programmable motion memory — record, store and replay full pick-and-place sequences.</p>
+          <div class="tags"><span class="tag">Arduino</span><span class="tag">Bluetooth</span><span class="tag">Servo Control</span><span class="tag">C++</span></div>
+          <img class="pprop" src="assets/props/robotarm.png" alt="" />
+        </article>
+
+        <article class="proj glass span-2 reveal" style="transition-delay:0.16s">
+          <div class="ptop">
+            <span class="pnum">PROJECT / 02</span>
+            <span class="ptype" style="color:#33503f; background:rgba(255,255,255,.45); border:1px solid rgba(255,255,255,.5)">IoT &middot; Sustainability</span>
+          </div>
+          <div class="arrow neu-sm"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <h3>Solar Smart Irrigation</h3>
+          <p>Arduino-driven irrigation that schedules watering from soil-moisture and weather data — fully off-grid on a solar array.</p>
+          <div class="tags"><span class="tag">Arduino</span><span class="tag">Solar</span><span class="tag">Sensors</span></div>
+          <img class="pprop" src="assets/props/cartridges.png" alt="" />
+        </article>
+
+        <article class="proj glass span-2 reveal" style="transition-delay:0s">
+          <div class="ptop">
+            <span class="pnum">PROJECT / 06</span>
+            <span class="ptype" style="color:#b3852f; background:rgba(255,255,255,.45); border:1px solid rgba(255,255,255,.5)">Web &middot; ERP</span>
+          </div>
+          <div class="arrow neu-sm"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <h3>Kulshi wa Kulashi ERP</h3>
+          <div class="arabic" style="color:var(--text-mute); font-size:14px; margin-top:-6px; margin-bottom:10px;">نظام ERP — كلشي وكلاشي</div>
+          <p>A full ERP suite — inventory, sales, purchasing and accounting — built for small retailers to run everything in one place.</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">Node</span><span class="tag">ERP</span></div>
+          <img class="pprop" src="assets/props/hasselblad.png" alt="" />
+        </article>
+
+        <article class="proj glass span-2 reveal" style="transition-delay:0.08s">
+          <div class="ptop">
+            <span class="pnum">PROJECT / 03</span>
+            <span class="ptype" style="color:#b23b34; background:rgba(255,255,255,.45); border:1px solid rgba(255,255,255,.5)">Web &middot; Front-End</span>
+          </div>
+          <div class="arrow neu-sm"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <h3>Pet Hotel Management</h3>
+          <p>Front-end for a pet-boarding platform — booking calendar, kennel availability and guest profiles in a warm, friendly UI.</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">UI/UX</span><span class="tag">Calendar</span></div>
+          <img class="pprop" src="assets/props/gameboy.png" alt="" />
+        </article>
+
+        <article class="proj glass span-3 reveal" style="transition-delay:0.16s">
+          <div class="ptop">
+            <span class="pnum">PROJECT / 05</span>
+            <span class="ptype" style="color:#436a52; background:rgba(255,255,255,.45); border:1px solid rgba(255,255,255,.5)">Data &middot; ML</span>
+          </div>
+          <div class="arrow neu-sm"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <h3>EHR Disease Risk Prediction</h3>
+          <p>An end-to-end machine-learning pipeline that ingests electronic health records and predicts disease risk with calibrated, explainable models.</p>
+          <div class="tags"><span class="tag">Python</span><span class="tag">ML</span><span class="tag">Pipeline</span><span class="tag">Healthcare</span></div>
+          <img class="pprop" src="assets/props/floppy1.png" alt="" />
+        </article>
+
+        <article class="proj glass span-3 reveal" style="transition-delay:0s">
+          <div class="ptop">
+            <span class="pnum">PROJECT / 07</span>
+            <span class="ptype" style="color:#b3852f; background:rgba(255,255,255,.45); border:1px solid rgba(255,255,255,.5)">Web &middot; Full-Stack</span>
+          </div>
+          <div class="arrow neu-sm"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <h3>Digital Restaurant System</h3>
+          <div class="arabic" style="color:var(--text-mute); font-size:14px; margin-top:-6px; margin-bottom:10px;">نظام إدارة المطعم الرقمي المتكامل</div>
+          <p>Integrated restaurant platform — POS, kitchen display, table &amp; order management and a digital menu, unified in one system.</p>
+          <div class="tags"><span class="tag">Full-Stack</span><span class="tag">POS</span><span class="tag">Realtime</span></div>
+          <img class="pprop" src="assets/props/camera1.png" alt="" />
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============================ CONTACT ============================ -->
+    <section id="contact" class="container contact">
+      <div class="contact-card glass-deep reveal">
+        <div class="contact-grid">
+          <div>
+            <div class="kicker">Get in touch</div>
+            <h2>Let's build<br/>something connected.</h2>
+            <p>Have an IoT idea, an app to ship, or a system to wire together? I'm open to freelance and full-time work.</p>
+            <a class="btn btn-primary" href="mailto:alsaadihusseinsaad@gmail.com">Start a conversation <span class="ar"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+          </div>
+          <div class="contact-links">
+            <a class="clink neu-sm" href="mailto:alsaadihusseinsaad@gmail.com">
+              <span class="ic"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M3 6.5l9 6 9-6"/></svg></span>
+              <span><small>Email</small><b>alsaadihusseinsaad@gmail.com</b></span>
+            </a>
+            <a class="clink neu-sm" href="https://github.com/Alsaadi-Hussein" target="_blank" rel="noopener">
+              <span class="ic"><svg class="svgic" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.27 2.75 1.05A9.4 9.4 0 0 1 12 6.85c.85 0 1.71.12 2.51.34 1.91-1.32 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.48-.01 2.82 0 .27.18.6.69.49A10.04 10.04 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg></span>
+              <span><small>GitHub</small><b>github.com/Alsaadi-Hussein</b></span>
+            </a>
+            <a class="clink neu-sm" href="https://www.linkedin.com/in/hussein-alsaadi" target="_blank" rel="noopener">
+              <span class="ic"><svg class="svgic" viewBox="0 0 24 24" fill="currentColor"><path d="M6.94 5a1.94 1.94 0 1 1-3.88 0 1.94 1.94 0 0 1 3.88 0zM3.3 8.4h3.3V21H3.3V8.4zm5.2 0h3.16v1.72h.05c.44-.83 1.5-1.7 3.1-1.7 3.3 0 3.9 2.17 3.9 5V21h-3.3v-5.9c0-1.4-.02-3.2-1.95-3.2-1.96 0-2.26 1.53-2.26 3.1V21H8.5V8.4z"/></svg></span>
+              <span><small>LinkedIn</small><b>in/hussein-alsaadi</b></span>
+            </a>
+            <a class="clink neu-sm" href="https://wa.me/9647706081185" target="_blank" rel="noopener">
+              <span class="ic"><svg class="svgic" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.06 2.88 1.21 3.08.15.2 2.09 3.2 5.07 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35zM12 2a10 10 0 0 0-8.6 15.06L2 22l5.05-1.32A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3 .78.8-2.92-.2-.31A8.2 8.2 0 1 1 12 20.2z"/></svg></span>
+              <span><small>WhatsApp</small><b>+964 770 608 1185</b></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer class="container">
+    <div class="foot-inner">
+      <div class="brand">
+        <span class="mark">HA</span>
+        <span><b>Hussein Alsaadi</b><span>ENGINEER &middot; IOT &middot; DEVELOPER</span></span>
+      </div>
+      <span class="mono">&copy; 2026 &middot; Designed &amp; built with care</span>
+    </div>
+  </footer>
+
+  <script>
+  (function () {
+    "use strict";
+
+    /* ---- Rotating role line (mirrors the React 2.3s interval) ---- */
+    var rot = document.getElementById("roleRot");
+    if (rot) {
+      var roles = rot.querySelectorAll("span");
+      var ri = 0;
+      setInterval(function () {
+        roles[ri].classList.remove("on");
+        ri = (ri + 1) % roles.length;
+        roles[ri].classList.add("on");
+      }, 2300);
+    }
+
+    /* ---- Scroll reveal (IntersectionObserver, same thresholds) ---- */
+    var els = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+    if (!("IntersectionObserver" in window)) {
+      els.forEach(function (e) { e.classList.add("in"); });
+    } else {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+      els.forEach(function (e) { io.observe(e); });
+    }
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# Dev tooling / installed agent skills (not part of the portfolio)
+.agents/
+skills-lock.json
+.mcp.json
+
+# OS / editor cruft
+Thumbs.db
+.DS_Store
+desktop.ini
+*.bin
