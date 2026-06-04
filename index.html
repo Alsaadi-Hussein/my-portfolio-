@@ -306,7 +306,9 @@ body[data-cards="neu"] .proj .tag{ background:var(--surface); border:none; box-s
 .clink:hover{ transform:translateX(6px); }
 .clink .ic{ width:46px;height:46px; border-radius:13px; display:grid; place-items:center; color:#fff; background:linear-gradient(135deg,var(--accent),var(--accent-2)); flex:none; }
 .clink small{ display:block; font-family:'JetBrains Mono'; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-mute); }
-.clink b{ font-family:'Space Grotesk'; font-weight:600; font-size:15px; word-break:break-all; }
+.clink b{ font-family:'Space Grotesk'; font-weight:600; font-size:15px; word-break:break-word; overflow-wrap:anywhere; }
+.clink{ min-width:0; }
+.clink > span:last-child{ min-width:0; }       /* let the email wrap instead of overflowing */
 
 /* ============================================================ FOOTER */
 footer{ position:relative; z-index:2; padding:40px 0 50px; text-align:center; }
@@ -347,19 +349,28 @@ footer{ position:relative; z-index:2; padding:40px 0 50px; text-align:center; }
   .contact h2{ font-size:clamp(28px,8vw,40px); }
   .hero h1{ font-size:clamp(34px,11vw,52px); }
   .hero p.lede{ font-size:16px; }
-  .portrait-frame{ width:min(84%,280px); }
-  .portrait-tag{ font-size:10px; padding:8px 11px; gap:8px; }
-  .portrait-tag .ic{ width:26px; height:26px; }
-  .pt-1{ left:-8px; } .pt-2{ right:-8px; } .pt-3{ left:-2px; }
+
+  /* portrait: keep the frame + floating tags fully inside the screen */
+  .portrait-frame{ width:min(76%,240px); }
+  .portrait-tag{ font-size:9.5px; padding:7px 10px; gap:7px; }
+  .portrait-tag .ic{ width:24px; height:24px; }
+  .pt-1{ left:4px; top:14%; } .pt-2{ right:4px; top:44%; } .pt-3{ left:8px; bottom:8%; }
+
   .about-card{ padding:24px 16px 0; }
   .about-card img{ height:auto; width:min(74%,250px); }
   .about-chiprow{ right:-2px; top:18%; }
   .mini-chip{ font-size:10px; padding:8px 11px; }
-  .hero-cta{ width:100%; }
-  .hero-cta .btn{ flex:1 1 auto; justify-content:center; }
-  .hero-stats{ gap:10px; }
-  .stat{ min-width:0; flex:1 1 30%; padding:14px 14px; }
-  .stat b{ font-size:22px; }
+
+  /* CTA buttons stack full-width so the second one never clips */
+  .hero-cta{ flex-direction:column; align-items:stretch; gap:12px; width:100%; }
+  .hero-cta .btn{ width:100%; justify-content:center; }
+
+  /* stats: three equal cells that always fit the row */
+  .hero-stats{ gap:10px; width:100%; }
+  .stat{ flex:1 1 0; min-width:0; padding:13px 8px; text-align:center; }
+  .stat b{ font-size:20px; }
+  .stat small{ font-size:9px; letter-spacing:.06em; }
+
   .brand b{ font-size:15px; }
   .brand span span{ display:none; }       /* drop subtitle to save nav width */
   .proj{ min-height:auto; padding:24px; }
