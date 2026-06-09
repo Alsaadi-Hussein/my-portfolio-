@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Hussein Alsaadi — IoT Engineer & Developer</title>
-<meta name="description" content="Hussein Alsaadi — Mobile Communications & Computing Engineer. IoT, embedded systems, Flutter & full-stack web." />
+<title>Hussein Alsaadi — IT & IoT Engineer | Developer</title>
+<meta name="description" content="Hussein Alsaadi — Mobile Communications & Computing Engineer | IT Support & Networking Specialist. IoT, networking, AI automation, Flutter & full-stack web." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <style>
@@ -257,8 +257,11 @@ body[data-density="subtle"] .float-prop.extra{ display:none; }
 .pill{ padding:9px 16px; border-radius:30px; font-size:13px; font-weight:600; font-family:'JetBrains Mono'; color:var(--text-soft); }
 
 /* ============================================================ SKILLS */
-.skills-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:22px; }
-.skill-card{ padding:26px 24px; border-radius:var(--r-md); position:relative; overflow:hidden; transition:transform .3s var(--ease); }
+.skills-grid{ display:flex; gap:22px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:18px; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--neu-dark) transparent; }
+.skills-grid::-webkit-scrollbar{ height:5px; }
+.skills-grid::-webkit-scrollbar-track{ background:transparent; }
+.skills-grid::-webkit-scrollbar-thumb{ background:var(--neu-dark); border-radius:10px; }
+.skill-card{ padding:26px 24px; border-radius:var(--r-md); position:relative; overflow:hidden; transition:transform .3s var(--ease); flex:0 0 calc(25% - 17px); min-width:240px; scroll-snap-align:start; }
 .skill-card:hover{ transform:translateY(-6px); }
 .skill-icon{ width:66px;height:66px; border-radius:18px; display:grid; place-items:center; margin-bottom:20px; position:relative; }
 .skill-icon img{ width:42px;height:42px; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(60,48,30,.25)); }
@@ -321,7 +324,7 @@ footer{ position:relative; z-index:2; padding:40px 0 50px; text-align:center; }
 
 /* ============================================================ RESPONSIVE */
 @media (max-width:1040px){
-  .skills-grid{ grid-template-columns:repeat(2,1fr); }
+  .skill-card{ flex:0 0 calc(50% - 11px); }
   .proj-grid{ grid-template-columns:repeat(4,1fr); }
   .proj.span-3,.proj.span-2,.proj.span-4{ grid-column:span 2; }
 }
@@ -344,7 +347,7 @@ footer{ position:relative; z-index:2; padding:40px 0 50px; text-align:center; }
   .hero{ padding-top:140px; padding-bottom:48px; min-height:auto; }
   .proj-grid{ grid-template-columns:1fr; }
   .proj.span-3,.proj.span-2,.proj.span-4{ grid-column:span 1; }
-  .skills-grid{ grid-template-columns:1fr; }
+  .skill-card{ flex:0 0 min(78vw,280px); }
   .container{ padding-left:20px; padding-right:20px; }
   .contact-card{ padding:40px 22px; }
   .contact h2{ font-size:clamp(28px,8vw,40px); }
@@ -406,7 +409,7 @@ body[data-hero="minimal"] .hero-grid{ grid-template-columns:1fr; max-width:760px
     <div class="nav-inner glass">
       <a class="brand" href="#top">
         <span class="mark">HA</span>
-        <span><b>Hussein Alsaadi</b><span>ENGINEER &middot; IOT &middot; DEV</span></span>
+        <span><b>Hussein Alsaadi</b><span>IT &middot; IOT &middot; AUTOMATION</span></span>
       </a>
       <div class="nav-links">
         <a href="#about">About</a>
@@ -450,20 +453,21 @@ body[data-hero="minimal"] .hero-grid{ grid-template-columns:1fr; max-width:760px
             <span class="mono">&gt;</span>
             <span class="role-rot" id="roleRot">
               <span class="on">IoT Engineer</span>
+              <span>IT Support Specialist</span>
+              <span>AI Automation</span>
               <span>Flutter Developer</span>
-              <span>Web Solutions</span>
-              <span>Embedded Systems</span>
+              <span>Web &amp; Networking</span>
             </span>
           </div>
-          <p class="lede">I build connected systems end to end — from the sensor and the solder joint to the mobile app in your hand. IoT, embedded firmware, Flutter apps, and full-stack web.</p>
+          <p class="lede">From network infrastructure and IT support to IoT firmware and mobile apps — I own the full stack. CCNA networking, embedded systems, AI automation, Flutter and full-stack web.</p>
           <div class="hero-cta">
             <a class="btn btn-primary" href="#work">View my work <span class="ar"><svg class="svgic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
             <a class="btn neu-press" href="#contact">Get in touch</a>
           </div>
           <div class="hero-stats">
             <div class="stat neu-sm reveal" style="transition-delay:0.1s"><b>7+</b><small>Shipped Projects</small></div>
-            <div class="stat neu-sm reveal" style="transition-delay:0.18s"><b>IoT</b><small>Hardware &rarr; Cloud</small></div>
-            <div class="stat neu-sm reveal" style="transition-delay:0.26s"><b>Flutter</b><small>Cross-platform</small></div>
+            <div class="stat neu-sm reveal" style="transition-delay:0.18s"><b>CCNA</b><small>Networking</small></div>
+            <div class="stat neu-sm reveal" style="transition-delay:0.26s"><b>AI</b><small>Automation</small></div>
           </div>
         </div>
         <div class="hero-portrait reveal" style="transition-delay:0.15s">
@@ -481,7 +485,7 @@ body[data-hero="minimal"] .hero-grid{ grid-template-columns:1fr; max-width:760px
     <!-- ============================ MARQUEE ============================ -->
     <div class="marquee" aria-hidden="true">
       <div class="marquee-track">
-        <span class="mq">IoT</span><span class="mq">Flutter</span><span class="mq">Arduino</span><span class="mq">ESP32</span><span class="mq">Embedded</span><span class="mq">Robotics</span><span class="mq">Machine Learning</span><span class="mq">Full-Stack</span><span class="mq">Firmware</span><span class="mq">MQTT</span><span class="mq">IoT</span><span class="mq">Flutter</span><span class="mq">Arduino</span><span class="mq">ESP32</span><span class="mq">Embedded</span><span class="mq">Robotics</span><span class="mq">Machine Learning</span><span class="mq">Full-Stack</span><span class="mq">Firmware</span><span class="mq">MQTT</span>
+        <span class="mq">IoT</span><span class="mq">Networking</span><span class="mq">Flutter</span><span class="mq">CCNA</span><span class="mq">Arduino</span><span class="mq">AI Automation</span><span class="mq">ESP32</span><span class="mq">IT Support</span><span class="mq">Embedded</span><span class="mq">Prompt Engineering</span><span class="mq">Full-Stack</span><span class="mq">Cisco</span><span class="mq">IoT</span><span class="mq">Networking</span><span class="mq">Flutter</span><span class="mq">CCNA</span><span class="mq">Arduino</span><span class="mq">AI Automation</span><span class="mq">ESP32</span><span class="mq">IT Support</span><span class="mq">Embedded</span><span class="mq">Prompt Engineering</span><span class="mq">Full-Stack</span><span class="mq">Cisco</span>
       </div>
     </div>
 
@@ -502,16 +506,16 @@ body[data-hero="minimal"] .hero-grid{ grid-template-columns:1fr; max-width:760px
         <div class="about-body reveal" style="transition-delay:0.1s">
           <div class="kicker">About me</div>
           <h2>Engineer at heart,<br/>builder by trade.</h2>
-          <p class="lead">I'm Hussein — a Mobile Communications &amp; Computing Engineer who lives in the space between hardware and software.</p>
-          <p>From wiring up an ESP32 to reading a fuel sensor, to shipping the Flutter app that visualises it, to standing up the ERP that runs a business — I enjoy owning the whole stack. I like problems that touch the physical world: robotics, IoT, sustainable systems, and the occasional health-data model.</p>
+          <p class="lead">I'm Hussein — a Mobile Communications &amp; Computing Engineer and IT Support &amp; Networking Specialist.</p>
+          <p>From configuring network infrastructure and troubleshooting hardware, to wiring up an ESP32 and shipping a Flutter app — I enjoy owning the full stack. I leverage AI automation and prompt engineering to accelerate development, and I like problems that span the physical and digital world: IoT, networking, robotics, and smart systems.</p>
           <div class="about-pills">
-            <span class="pill neu-sm">Embedded C/C++</span>
+            <span class="pill neu-sm">CCNA &middot; Networking</span>
+            <span class="pill neu-sm">IT Support</span>
+            <span class="pill neu-sm">AI &amp; Automation</span>
             <span class="pill neu-sm">Flutter &middot; Dart</span>
-            <span class="pill neu-sm">React</span>
-            <span class="pill neu-sm">Python &middot; ML</span>
-            <span class="pill neu-sm">Arduino</span>
-            <span class="pill neu-sm">IoT Architecture</span>
-            <span class="pill neu-sm">UI/UX</span>
+            <span class="pill neu-sm">Arduino &middot; IoT</span>
+            <span class="pill neu-sm">Web Front-End</span>
+            <span class="pill neu-sm">Prompt Engineering</span>
           </div>
         </div>
       </div>
@@ -522,32 +526,54 @@ body[data-hero="minimal"] .hero-grid{ grid-template-columns:1fr; max-width:760px
       <div class="section-head reveal">
         <div class="kicker">What I do</div>
         <h2>Four disciplines,<br/>one engineer.</h2>
-        <p>I move fluidly across the stack — pairing low-level embedded work with polished, human-facing apps.</p>
+        <p>From network infrastructure and IT support to IoT firmware, AI automation, and polished mobile apps.</p>
       </div>
       <div class="skills-grid">
         <div class="skill-card glass reveal" style="transition-delay:0s">
           <div class="skill-icon neu-sm"><img src="assets/props/microchip.png" alt="" /></div>
-          <span class="role">Hardware &rarr; Cloud</span>
-          <h3>Embedded &amp; IoT</h3>
-          <ul><li>ESP32 / Arduino firmware</li><li>Sensor networks &amp; MQTT</li><li>PCB &amp; circuit prototyping</li><li>Real-time telemetry</li></ul>
+          <span class="role">CCNA &middot; Infrastructure</span>
+          <h3>Networking &amp; IT</h3>
+          <ul>
+            <li>Network Configuration</li>
+            <li>CCNA Fundamentals</li>
+            <li>Cisco Packet Tracer</li>
+            <li>Windows Server</li>
+            <li>Fiber Optical Tech.</li>
+          </ul>
         </div>
         <div class="skill-card glass reveal" style="transition-delay:0.08s">
-          <div class="skill-icon neu-sm"><img src="assets/props/gameboy.png" alt="" /></div>
-          <span class="role">Flutter &middot; Dart</span>
-          <h3>Mobile Apps</h3>
-          <ul><li>Flutter &amp; Dart</li><li>Cross-platform builds</li><li>Firebase / REST APIs</li><li>Clean state management</li></ul>
+          <div class="skill-icon neu-sm"><img src="assets/props/robotarm.png" alt="" /></div>
+          <span class="role">Hardware &middot; Systems</span>
+          <h3>IT Support &amp; Hardware</h3>
+          <ul>
+            <li>Hardware Troubleshooting</li>
+            <li>Software Installation</li>
+            <li>System Maintenance</li>
+            <li>IoT Systems &amp; Sensors</li>
+            <li>Arduino Programming</li>
+          </ul>
         </div>
         <div class="skill-card glass reveal" style="transition-delay:0.16s">
           <div class="skill-icon neu-sm"><img src="assets/props/floppy1.png" alt="" /></div>
-          <span class="role">Full-Stack</span>
-          <h3>Web &amp; ERP</h3>
-          <ul><li>React front-ends</li><li>Node &amp; API design</li><li>ERP / dashboard systems</li><li>Responsive UI</li></ul>
+          <span class="role">AI Tools &middot; Workflows</span>
+          <h3>AI &amp; Automation</h3>
+          <ul>
+            <li>Advanced Prompt Engineering</li>
+            <li>ChatGPT / Gemini / Claude</li>
+            <li>AI-Assisted Development</li>
+            <li>Code Debugging &amp; Refactoring</li>
+          </ul>
         </div>
         <div class="skill-card glass reveal" style="transition-delay:0.24s">
-          <div class="skill-icon neu-sm"><img src="assets/props/camera1.png" alt="" /></div>
-          <span class="role">ML &middot; Pipelines</span>
-          <h3>Data &amp; Vision</h3>
-          <ul><li>ML prediction pipelines</li><li>Health-risk modelling</li><li>Data engineering</li><li>Computer vision</li></ul>
+          <div class="skill-icon neu-sm"><img src="assets/props/gameboy.png" alt="" /></div>
+          <span class="role">Flutter &middot; Web &middot; MATLAB</span>
+          <h3>Development</h3>
+          <ul>
+            <li>Flutter Mobile Apps</li>
+            <li>Web Front-End</li>
+            <li>MATLAB</li>
+            <li>API Integration</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -689,7 +715,7 @@ body[data-hero="minimal"] .hero-grid{ grid-template-columns:1fr; max-width:760px
     <div class="foot-inner">
       <div class="brand">
         <span class="mark">HA</span>
-        <span><b>Hussein Alsaadi</b><span>ENGINEER &middot; IOT &middot; DEVELOPER</span></span>
+        <span><b>Hussein Alsaadi</b><span>IT &middot; IOT &middot; AUTOMATION</span></span>
       </div>
       <span class="mono">&copy; 2026 &middot; Designed &amp; built with care</span>
     </div>
