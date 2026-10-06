@@ -13,6 +13,7 @@ Open [`index.html`](index.html) in any modern browser — that's it.
 
 ```
 index.html          The whole site (HTML + inline CSS + vanilla JS)
+intro.js            Entrance intro (plays once per session; add ?intro to replay)
 assets/
   person/           Portrait cutouts (waving, laptop)
   props/            Retro-tech decorative props (Game Boy, robot arm, cameras…)
