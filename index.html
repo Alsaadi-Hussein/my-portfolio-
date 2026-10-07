@@ -355,19 +355,16 @@ body[data-density="subtle"] .float-prop.extra{ display:none; }
 
 @media (max-width:880px){
   .console{ grid-template-columns:1fr; gap:22px; }
-  .console-tabs{ flex-direction:row; overflow-x:auto; gap:14px; padding:12px 10px 26px; margin:-12px -10px -26px; scroll-snap-type:x proximity; scrollbar-width:none; }
-  .console-tabs::-webkit-scrollbar{ display:none; }
-  .ctab{ flex:0 0 auto; width:auto; min-width:210px; scroll-snap-align:start; padding:16px 18px; }
-  .ctab:hover,.ctab[aria-selected="true"]{ transform:translateY(-3px); }
-  .ctab-go{ display:none; }
+  .console-tabs{ gap:14px; }   /* tabs stay stacked like on the PC (no scroller, so no clipped shadows) */
+  .ctab{ padding:16px 18px; }
+  .ctab:hover{ transform:translateX(4px); }
+  .ctab[aria-selected="true"]{ transform:translateX(8px); }
   .console-stage{ padding:26px 22px; min-height:0; }
   .cpanel{ grid-template-columns:1fr; gap:18px; }
   .cp-art{ order:-1; }
   .cp-art svg{ max-width:300px; }
 }
 @media (max-width:560px){
-  .ctab{ min-width:190px; }
-  .ctab-t small{ display:none; }
   .console-stage{ padding:22px 18px; }
 }
 
@@ -449,7 +446,9 @@ footer{ position:relative; z-index:var(--z-content); padding:40px 0 50px; text-a
   .nav-cta{ display:none; }
   .nav-burger{ display:grid; }
   .nav.open .nav-menu{ display:flex; animation:menuIn .25s var(--ease); }
-  .props-layer{ display:none; }            /* declutter hero on phones */
+  /* the floating props stay on phones too (smaller), so the hero feels like the PC one */
+  .float-prop:not(.extra){ top:112px!important; right:-2px!important; width:76px!important; }
+  .float-prop.extra{ bottom:4px!important; right:10px!important; width:54px!important; }
 }
 @media (max-width:560px){
   section{ padding:72px 0; }
@@ -474,9 +473,9 @@ footer{ position:relative; z-index:var(--z-content); padding:40px 0 50px; text-a
   .about-chiprow{ right:-2px; top:18%; }
   .mini-chip{ font-size:10px; padding:8px 11px; }
 
-  /* CTA buttons stack full-width so the second one never clips */
-  .hero-cta{ flex-direction:column; align-items:stretch; gap:12px; width:100%; }
-  .hero-cta .btn{ width:100%; justify-content:center; }
+  /* CTA buttons sit side by side like on the PC; they share the row so neither clips */
+  .hero-cta{ flex-wrap:nowrap; gap:10px; width:100%; }
+  .hero-cta .btn{ flex:1 1 0; min-width:0; justify-content:center; padding:14px 10px; font-size:14px; }
 
   /* stats: rigid 3-column grid so all three always fit the row */
   .hero-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:100%; margin-top:30px; }
@@ -672,6 +671,13 @@ html{ scroll-padding-top:88px; }
   .isl-max .isl-mark{ margin-right:2px; }
   .isl-max a:not(.isl-mark){ padding:10px 9px; font-size:13px; }
   .isl-max .isl-cta{ display:none; }
+}
+/* phones: the whole nav tucks away while the page is moving; the small island comes back when it stops */
+.island-wrap{ transition:opacity .25s var(--ease), transform .45s var(--spring); }
+@media (max-width:880px){
+  .nav[data-scrolling="true"] .island-wrap{ opacity:0; transform:translateY(-70px); }
+  .nav[data-scrolling="true"] .isl-min,.nav[data-scrolling="true"] .isl-max{ pointer-events:none; }
+  .nav[data-scrolling="true"] .nav-full{ opacity:0; transform:translateY(-30px) scale(.94); pointer-events:none; }
 }
 @media (prefers-reduced-motion:reduce){
   :root{ --spring:cubic-bezier(.22,.61,.36,1); }   /* same morph, no overshoot */
@@ -1184,17 +1190,18 @@ html{ scroll-padding-top:88px; }
     }
 
 
-    /* ---- Project screenshots: edit this list to use your own images ----
+    /* ---- Project pictures: edit this list to use your own images ----
        One gallery of five pictures. Keys match the "PROJECT / 0N" label on a card; the first
        image is that card's cover, and the lightbox pages through every picture in card order.
-       A project with no entry simply has no cover. Use plain paths such as
-       "assets/projects/fuel-tank.jpg". These are placeholders until you add real screenshots. */
+       A project with no entry simply has no cover. These are illustrated mockups drawn for each
+       project (assets/projects/*.svg); swap any of them for a real screenshot, e.g.
+       "assets/projects/fuel-tank.jpg", whenever you have one. */
     var SHOTS = {
-      "01": ["https://placehold.co/1600x1000/e2d9c9/6c6353?text=Fuel+Tank+Monitoring"],
-      "04": ["https://placehold.co/1600x1000/e2d9c9/6c6353?text=6-DOF+Robotic+Arm"],
-      "02": ["https://placehold.co/1600x1000/e2d9c9/6c6353?text=Solar+Smart+Irrigation"],
-      "06": ["https://placehold.co/1600x1000/e2d9c9/6c6353?text=Kulshi+wa+Kulashi+ERP"],
-      "03": ["https://placehold.co/1600x1000/e2d9c9/6c6353?text=Pet+Hotel+Management"]
+      "01": ["assets/projects/fuel-tank.svg"],
+      "04": ["assets/projects/robotic-arm.svg"],
+      "02": ["assets/projects/solar-irrigation.svg"],
+      "06": ["assets/projects/erp.svg"],
+      "03": ["assets/projects/pet-hotel.svg"]
     };
 
     var docEl = document.documentElement;
@@ -1411,7 +1418,8 @@ html{ scroll-padding-top:88px; }
       var secs = [["top", "Home"], ["about", "About"], ["skills", "Skills"], ["work", "Work"], ["contact", "Contact"]]
         .map(function (s) { return { el: document.getElementById(s[0]), id: s[0], name: s[1] }; })
         .filter(function (s) { return s.el; });
-      var mode = "full", isOpen = false, closeT = 0, raf = 0, cur = "";
+      var mode = "full", isOpen = false, closeT = 0, raf = 0, cur = "", lastY = 0, idleT = 0;
+      var phone = window.matchMedia("(max-width: 880px)");
 
       function sync() {
         var island = mode === "island";
@@ -1431,6 +1439,16 @@ html{ scroll-padding-top:88px; }
       function update() {
         raf = 0;
         var y = window.pageYOffset;
+        if (phone.matches && Math.abs(y - lastY) > 2 && y > 24) {
+          // phones: hide the nav while the page is moving, bring the small island back once it stops
+          nav.setAttribute("data-scrolling", "true");
+          nav.classList.remove("open");
+          if (burger) burger.setAttribute("aria-expanded", "false");
+          if (isOpen) setOpen(false);
+          clearTimeout(idleT);
+          idleT = setTimeout(function () { nav.removeAttribute("data-scrolling"); }, 650);
+        }
+        lastY = y;
         var next = mode === "full" ? (y > 90 ? "island" : "full") : (y < 40 ? "full" : "island");   // a little hysteresis
         if (next !== mode) {
           mode = next;
