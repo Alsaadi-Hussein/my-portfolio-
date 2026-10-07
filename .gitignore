@@ -3,6 +3,9 @@
 skills-lock.json
 .mcp.json
 
+# Design handoff source (reference only, the site does not load it)
+assets/motion/
+
 # OS / editor cruft
 Thumbs.db
 .DS_Store

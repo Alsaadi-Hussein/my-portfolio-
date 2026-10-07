@@ -1,9 +1,21 @@
 /* ============================================================
-   Entrance intro: line-drawn "HA" monogram, boot counter,
-   kinetic role phrases, then a horizontal split that zooms
-   through to the real hero. Plays once per browser session;
-   Skip button / Esc jumps to the split. Add ?intro to the URL
-   to force it to replay.
+   Entrance intro (v2): line-drawn "HA" monogram on a raised
+   neumorphic tile, glass HUD pills, boot counter, kinetic role
+   phrases, then a horizontal split that zooms through to the
+   real hero.
+
+   Two compositions from the design handoff:
+     d  desktop / landscape   1920 x 1080
+     m  phone / portrait      1080 x 1920
+   The one that matches the viewport is picked on load and when
+   the screen rotates. Each is a fixed design canvas scaled to
+   fit ("contain"); background, grid and circuit traces bleed out
+   to the real screen edges so nothing is letterboxed.
+
+   Plays once per browser session (a calm cross-fade version when
+   the visitor has reduced motion on); Skip button / Esc jumps to
+   the split. Add ?intro to the URL to force a replay, or
+   ?intro=4.2 to freeze on one frame (design review).
 
    Loaded synchronously at the top of <body> so the overlay is
    in place before the page paints. Everything is rendered from
@@ -13,11 +25,16 @@
   "use strict";
 
   var KEY = "ha-intro-seen";
-  var force = /[?&]intro\b/.test(location.search);
+  var qm = /[?&]intro(?:=(\d*\.?\d+))?(?:&|$)/.exec(location.search);
+  var force = !!qm;
+  var freezeAt = qm && qm[1] != null ? parseFloat(qm[1]) : null;
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Visitors who asked their system for less motion still get the intro, but a calm version:
+  // same drawing, counter and phrases, with a gentle cross-fade instead of the zoom and split.
+  var calm = !!reduce;
   var seen = false;
   try { seen = sessionStorage.getItem(KEY) === "1"; } catch (e) {}
-  if (!force && (seen || reduce || location.hash.length > 1)) return;
+  if (!force && (seen || location.hash.length > 1)) return;
   if (!document.body || !window.requestAnimationFrame) return;
   try { sessionStorage.setItem(KEY, "1"); } catch (e) {}
 
@@ -29,6 +46,9 @@
   var INK = "#2B241C", BG = "#F1E9DA", ACCENT = "#2F5D46";
   var SANS = "'Space Grotesk', system-ui, sans-serif";
   var MONO = "'JetBrains Mono', ui-monospace, monospace";
+  var SPRING = "cubic-bezier(.34,1.56,.64,1)";
+  var GLASS_BG = "linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,.18))";
+  var RAISED_BG = "linear-gradient(145deg,#F7F0E3,#E8DEC9)";
 
   /* ---------- Motion ---------- */
   var E = {
@@ -45,23 +65,9 @@
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function pr(T, a, b, ease) { return (ease || MOTION.enter)(clamp((T - a) / (b - a), 0, 1)); }
 
-  /* ---------- Geometry (1920x1080 design space) ---------- */
-  var TRACES = [
-    "M0 180 H260 L330 250 H620 L660 290 V420 H860",
-    "M0 420 H140 L200 480 H420 V640 L470 690 H700",
-    "M0 860 H300 L360 800 H640 V740 H820",
-    "M1920 200 H1640 L1580 260 H1300 L1260 300 V430 H1080",
-    "M1920 500 H1760 L1700 560 H1500 V680 L1450 730 H1200",
-    "M1920 880 H1560 L1500 820 H1260 V760 H1100",
-    "M540 0 V90 L600 150 H860 V260",
-    "M1380 0 V120 L1320 180 H1120 V280",
-    "M700 1080 V980 L760 920 H900 V820",
-    "M1240 1080 V1000 L1180 940 H1040 V840"
-  ];
-  var NODES = [[860,420],[700,690],[820,740],[1080,430],[1200,730],[1100,760],[860,260],[1120,280],[900,820],[1040,840]];
+  /* ---------- Shared geometry: monogram (H + A) and corner brackets ---------- */
   var CUBE_EDGES = [];
   for (var ci = 0; ci < 8; ci++) [1, 2, 4].forEach(function (m) { if (!(ci & m)) CUBE_EDGES.push([ci, ci | m]); });
-  // Monogram: H (left) + A (right), then four corner brackets
   var STROKES = [
     { d: "M-130 -80 V80", col: INK, a: 1.4, b: 2.4 },
     { d: "M-130 0 H-30", col: INK, a: 2.2, b: 2.9 },
@@ -70,34 +76,119 @@
     { d: "M50 30 H120", col: ACCENT, a: 2.8, b: 3.4 }
   ];
   var BRACKETS = [[1, 1, 2.6], [-1, 1, 2.7], [1, -1, 2.8], [-1, -1, 2.9]];
-  var PHRASES = [
-    { text: "COMMUNICATIONS ENGINEER", a: CUES.Phrases, b: CUES.Phrases + 1.6 },
-    { text: "SOFTWARE & IOT DEVELOPER", a: CUES.Phrases + 1.6, b: CUES.Phrases + 3.2 },
-    { text: "IT & AUTOMATION", a: CUES.Phrases + 3.2, b: CUES.Phrases + 4.8 }
-  ];
+
+  /* ---------- The two compositions (numbers from intro-piece.jsx / intro-mobile.jsx) ---------- */
+  var DESIGN = {
+    d: {
+      W: 1920, H: 1080, label: 24,
+      cy: 540, shrinkY: 210, shrinkS: 0.6, monoK: 1, dy: 600,
+      glow: "radial-gradient(ellipse 700px 700px at 0% 30%,rgba(120,150,125,.45),transparent 70%),radial-gradient(ellipse 800px 600px at 45% 100%,rgba(232,170,160,.45),transparent 70%),radial-gradient(ellipse 600px 600px at 100% 60%,rgba(240,205,130,.4),transparent 70%)",
+      gridCy: 540, gridR: 1500,
+      traceOp: 0.2,
+      traces: [
+        "M0 180 H260 L330 250 H620 L660 290 V420 H860",
+        "M0 420 H140 L200 480 H420 V640 L470 690 H700",
+        "M0 860 H300 L360 800 H640 V740 H820",
+        "M1920 200 H1640 L1580 260 H1300 L1260 300 V430 H1080",
+        "M1920 500 H1760 L1700 560 H1500 V680 L1450 730 H1200",
+        "M1920 880 H1560 L1500 820 H1260 V760 H1100",
+        "M540 0 V90 L600 150 H860 V260",
+        "M1380 0 V120 L1320 180 H1120 V280",
+        "M700 1080 V980 L760 920 H900 V820",
+        "M1240 1080 V1000 L1180 940 H1040 V840"
+      ],
+      nodes: [[860, 420], [700, 690], [820, 740], [1080, 430], [1200, 730], [1100, 760], [860, 260], [1120, 280], [900, 820], [1040, 840]],
+      cubes: [
+        { r: 250, k: 130, a: 0.4, b: 2.6, op: 0.9, opK: 0.2, spin: 1 },
+        { r: 140, k: 75, a: 1.0, b: 3.0, op: 0.5, opK: 0, spin: -1.4 }
+      ],
+      tile: {
+        size: 540, radius: 130, inset: 64, innerRadius: 80,
+        shadow: "18px 18px 44px rgba(140,120,90,.32),-18px -18px 44px rgba(255,255,255,.95)",
+        innerShadow: "inset 10px 10px 24px rgba(140,120,90,.22),inset -10px -10px 24px rgba(255,255,255,.8)"
+      },
+      hud: {
+        boot: { h: "l", v: "t", x: 96, y: 64, st: { padding: "14px 32px", fontSize: "24px", letterSpacing: ".2em" } },
+        clock: { h: "r", v: "t", x: 96, y: 64, st: { padding: "14px 32px", fontSize: "24px", letterSpacing: ".2em" } },
+        count: { h: "r", v: "b", x: 96, y: 70, st: { padding: "14px 48px 18px", gap: "28px" }, statusFs: "24px", numFs: "88px" },
+        bar: { x: 160, y: 70 },
+        skip: { x: 96, y: 84 }
+      },
+      phrase: { top: 590, pad: "22px 64px", radius: 56, fs: 112, ls: ".01em", lh: "normal", space: 34, ty: 70 },
+      phrases: [["COMMUNICATIONS ENGINEER"], ["SOFTWARE & IOT DEVELOPER"], ["IT & AUTOMATION"]]
+    },
+    m: {
+      W: 1080, H: 1920, label: 22,
+      cy: 760, shrinkY: 260, shrinkS: 0.5, monoK: 0.85, dy: 900,
+      glow: "radial-gradient(ellipse 700px 700px at 0% 25%,rgba(120,150,125,.45),transparent 70%),radial-gradient(ellipse 800px 700px at 50% 100%,rgba(232,170,160,.45),transparent 70%),radial-gradient(ellipse 600px 700px at 100% 60%,rgba(240,205,130,.4),transparent 70%)",
+      gridCy: 768, gridR: 1600,
+      traceOp: 0.25,
+      traces: [
+        "M0 300 H160 L220 360 H300 V620",
+        "M1080 420 H900 L840 480 H760 V720",
+        "M0 1520 H200 L260 1460 H420 V1320",
+        "M1080 1580 H820 L760 1520 H640 V1380",
+        "M300 0 V100 L360 160 H520 V260",
+        "M800 0 V140 L740 200 H600 V300"
+      ],
+      nodes: [[300, 620], [760, 720], [420, 1320], [640, 1380], [520, 260], [600, 300]],
+      cubes: [
+        { r: 210, k: 105, a: 0.4, b: 2.6, op: 0.9, opK: 0.2, spin: 1 },
+        { r: 115, k: 58, a: 1.0, b: 3.0, op: 0.5, opK: 0, spin: -1.4 }
+      ],
+      tile: {
+        size: 460, radius: 112, inset: 56, innerRadius: 68,
+        shadow: "16px 16px 40px rgba(140,120,90,.32),-16px -16px 40px rgba(255,255,255,.95)",
+        innerShadow: "inset 8px 8px 20px rgba(140,120,90,.22),inset -8px -8px 20px rgba(255,255,255,.8)"
+      },
+      hud: {
+        boot: { h: "c", v: "t", x: 0, y: 90, st: { padding: "14px 30px", fontSize: "22px", letterSpacing: ".18em" } },
+        clock: null,
+        count: { h: "c", v: "b", x: 0, y: 150, st: { padding: "16px 48px 20px", gap: "24px" }, statusFs: "22px", numFs: "72px" },
+        bar: { x: 120, y: 120 },
+        skip: null
+      },
+      phrase: { top: 930, pad: "28px 48px", radius: 48, fs: 92, ls: ".005em", lh: "1.08", space: 0, ty: 60 },
+      phrases: [["COMMUNICATIONS", "ENGINEER"], ["SOFTWARE &", "IOT", "DEVELOPER"], ["IT &", "AUTOMATION"]]
+    }
+  };
 
   /* ---------- Styles ---------- */
   var css = [
     "html.ha-lock,html.ha-lock body{overflow:hidden}",
     "html.ha-hold .hero .reveal,html.ha-hold .hero .reveal.in{opacity:0;transform:translateY(40px)}",
-    "#ha-intro{position:fixed;inset:0;z-index:1000;overflow:hidden;-webkit-font-smoothing:antialiased}",
+    "#ha-intro{position:fixed;inset:0;z-index:1000;overflow:hidden;line-height:normal;-webkit-font-smoothing:antialiased}",
+    "#ha-intro *{box-sizing:content-box}",
     "#ha-intro .ha-view{position:absolute;inset:0;overflow:hidden;background:" + BG + ";transform-origin:50% 50%}",
-    "#ha-intro .ha-bg{position:absolute;left:50%;top:50%;width:1920px;height:1080px;margin:-540px 0 0 -960px}",
-    "#ha-intro .ha-glow{position:absolute;inset:0;background:radial-gradient(ellipse 700px 700px at 0% 30%,rgba(120,150,125,.45),transparent 70%),radial-gradient(ellipse 800px 600px at 45% 100%,rgba(232,170,160,.45),transparent 70%),radial-gradient(ellipse 600px 600px at 100% 60%,rgba(240,205,130,.4),transparent 70%)}",
-    "#ha-intro .ha-grid{position:absolute;inset:0;opacity:.2;background-image:linear-gradient(rgba(47,93,70,1) 1px,transparent 1px),linear-gradient(90deg,rgba(47,93,70,1) 1px,transparent 1px);background-size:60px 60px}",
+    "#ha-intro .ha-bleed,#ha-intro .ha-canvas{position:absolute;left:50%;top:50%;transform-origin:50% 50%}",
+    "#ha-intro .ha-glow,#ha-intro .ha-grid{position:absolute;left:0;top:0;width:100%;height:100%}",
+    "#ha-intro .ha-grid{opacity:.2;background-image:linear-gradient(rgba(47,93,70,1) 1px,transparent 1px),linear-gradient(90deg,rgba(47,93,70,1) 1px,transparent 1px);background-size:60px 60px}",
     "#ha-intro svg{position:absolute;left:0;top:0;overflow:visible}",
-    "#ha-intro .ha-mono{position:absolute;font-family:" + MONO + ";color:" + INK + ";white-space:nowrap}",
-    "#ha-intro .ha-count{position:absolute;display:flex;align-items:baseline;font-family:" + MONO + "}",
+    "#ha-intro .ha-tile{position:absolute;background:" + RAISED_BG + ";border:1px solid rgba(255,255,255,.6)}",
+    "#ha-intro .ha-panel{position:absolute;background:" + GLASS_BG + ";-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.75)}",
+    "#ha-intro .ha-hud{position:absolute;display:flex;pointer-events:none}",
+    "#ha-intro .ha-hud>*{flex:none}",
+    "#ha-intro .ha-pill{font-family:" + MONO + ";color:" + INK + ";white-space:nowrap;border-radius:32px;background:" + GLASS_BG + ";-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.75);box-shadow:0 20px 50px rgba(60,48,30,.14),inset 0 1px 0 rgba(255,255,255,.9)}",
+    "#ha-intro .ha-count{display:flex;align-items:baseline;font-family:" + MONO + ";border-radius:48px;background:" + RAISED_BG + ";border:1px solid rgba(255,255,255,.6)}",
+    "#ha-intro .ha-status{letter-spacing:.3em}",
     "#ha-intro .ha-num{font-weight:500;color:" + INK + ";font-variant-numeric:tabular-nums}",
     "#ha-intro .ha-bar{position:absolute;height:1px;background:rgba(43,36,28,.14)}",
-    "#ha-intro .ha-fill{position:absolute;left:0;top:-.5px;height:2px;background:" + ACCENT + ";box-shadow:0 0 5px " + ACCENT + "}",
-    "#ha-intro .ha-phrase{position:absolute;left:0;width:100%;display:flex;flex-direction:column;align-items:center}",
-    "#ha-intro .ha-idx{font-family:" + MONO + ";letter-spacing:.3em;color:" + ACCENT + "}",
-    "#ha-intro .ha-row{display:flex;white-space:nowrap;font-family:" + SANS + ";font-weight:600;letter-spacing:.01em;color:" + INK + ";line-height:1.2}",
+    "#ha-intro .ha-fill{position:absolute;left:0;top:-.5px;width:100%;height:2px;background:" + ACCENT + ";box-shadow:0 0 5px " + ACCENT + ";transform-origin:0 50%}",
+    "#ha-intro .ha-phrase{position:absolute;left:0;display:flex;flex-direction:column;align-items:center;gap:28px}",
+    "#ha-intro .ha-idx{font-family:" + MONO + ";font-size:24px;letter-spacing:.3em;color:" + ACCENT + "}",
+    "#ha-intro .ha-ph{display:flex;flex-direction:column;align-items:center;font-family:" + SANS + ";font-weight:600;color:" + INK + "}",
+    "#ha-intro .ha-row{display:flex}",
     "#ha-intro .ha-row span{display:inline-block}",
     "#ha-intro .ha-flash{position:absolute;left:0;right:0;top:calc(50% - 1px);height:2px;background:#fff;box-shadow:0 0 30px 6px rgba(255,255,255,.9);pointer-events:none}",
-    "#ha-intro .ha-skip{position:absolute;z-index:2;font:500 12px/1 " + MONO + ";letter-spacing:.24em;color:" + INK + ";background:rgba(255,251,242,.55);border:1px solid rgba(43,36,28,.22);border-radius:999px;padding:11px 18px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s,border-color .2s}",
-    "#ha-intro .ha-skip:hover,#ha-intro .ha-skip:focus-visible{background:rgba(255,251,242,.9);border-color:" + ACCENT + ";outline:none}"
+    /* skip button: hover / focus / pressed use transform + opacity only */
+    "#ha-intro .ha-skip{position:absolute;z-index:2;isolation:isolate;font:500 12px/1 " + MONO + ";letter-spacing:.24em;color:" + INK + ";background:rgba(255,251,242,.55);border:1px solid rgba(43,36,28,.22);border-radius:999px;padding:11px 18px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .25s " + SPRING + "}",
+    "#ha-intro .ha-skip::before,#ha-intro .ha-skip::after{content:'';position:absolute;left:-1px;top:-1px;right:-1px;bottom:-1px;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .2s ease}",
+    "#ha-intro .ha-skip::before{z-index:-1;background:rgba(255,251,242,.9)}",
+    "#ha-intro .ha-skip::after{border:1px solid " + ACCENT + "}",
+    "#ha-intro .ha-skip:hover{transform:translateY(-1px)}",
+    "#ha-intro .ha-skip:hover::before,#ha-intro .ha-skip:hover::after,#ha-intro .ha-skip:focus-visible::before,#ha-intro .ha-skip:focus-visible::after{opacity:1}",
+    "#ha-intro .ha-skip:focus-visible{outline:2px solid " + ACCENT + ";outline-offset:3px}",
+    "#ha-intro .ha-skip:active{transform:scale(.96)}"
   ].join("\n");
   var styleEl = document.createElement("style");
   styleEl.textContent = css;
@@ -129,38 +220,74 @@
   document.body.insertBefore(root, document.body.firstChild);
   document.documentElement.classList.add("ha-lock", "ha-hold");
 
-  function buildView(n) {
-    var v = {};
-    v.el = h("div", "ha-view", root);
+  var flash = h("div", "ha-flash", root);
+  var skip = h("button", "ha-skip", root, "SKIP INTRO →");
+  skip.type = "button";
+
+  var views = [], compKey = null, L = {};
+
+  function canvas(parent, C) {
+    var c = h("div", "ha-canvas", parent);
+    c.style.width = C.W + "px";
+    c.style.height = C.H + "px";
+    c.style.marginLeft = -C.W / 2 + "px";
+    c.style.marginTop = -C.H / 2 + "px";
+    return c;
+  }
+  function hud(parent, spec, cls, html) {
+    var box = h("div", "ha-hud", parent);
+    var el = h("div", cls, box, html);
+    Object.assign(el.style, spec.st);
+    return { box: box, el: el, spec: spec };
+  }
+
+  function buildView(n, C) {
+    var v = { C: C };
+    v.el = document.createElement("div");
+    v.el.className = "ha-view";
     v.el.setAttribute("aria-hidden", "true");
+    root.insertBefore(v.el, flash);
 
-    // background layer: fixed 1920x1080 design, scaled to cover
-    v.bg = h("div", "ha-bg", v.el);
-    h("div", "ha-glow", v.bg);
-    v.grid = h("div", "ha-grid", v.bg);
-    var bsvg = s("svg", { width: 1920, height: 1080, viewBox: "0 0 1920 1080" }, v.bg);
-    v.traces = TRACES.map(function (d) {
-      return {
-        base: s("path", { d: d, pathLength: 1, fill: "none", stroke: ACCENT, "stroke-width": 1.5, "stroke-opacity": 0.2, "stroke-dasharray": "1 1" }, bsvg),
-        pulse: s("path", { d: d, pathLength: 1, fill: "none", stroke: INK, "stroke-width": 2.5, "stroke-linecap": "round", "stroke-dasharray": "0.05 1" }, bsvg)
-      };
+    // bleed layer: background, glow and grid fill the real viewport
+    v.bleed = h("div", "ha-bleed", v.el);
+    v.glow = h("div", "ha-glow", v.bleed);
+    v.glow.style.background = C.glow;
+    v.grid = h("div", "ha-grid", v.bleed);
+
+    // design canvas: tile, circuit traces, cubes, monogram
+    v.cv = canvas(v.el, C);
+    var tl = C.tile;
+    v.tile = h("div", "ha-tile", v.cv);
+    Object.assign(v.tile.style, {
+      left: C.W / 2 - tl.size / 2 + "px", top: C.cy - tl.size / 2 + "px",
+      width: tl.size + "px", height: tl.size + "px", borderRadius: tl.radius + "px", boxShadow: tl.shadow
     });
-    v.nodes = NODES.map(function (p) {
-      return s("circle", { cx: p[0], cy: p[1], r: 5, fill: "none", stroke: ACCENT, "stroke-width": 1.5 }, bsvg);
+    v.panel = h("div", "ha-panel", v.tile);
+    Object.assign(v.panel.style, {
+      left: tl.inset + "px", top: tl.inset + "px", right: tl.inset + "px", bottom: tl.inset + "px",
+      borderRadius: tl.innerRadius + "px", boxShadow: tl.innerShadow
     });
 
-    // foreground layer: design coordinates centred on the viewport
-    v.fg = s("svg", { preserveAspectRatio: "xMidYMid meet" }, v.el);
+    v.svg = s("svg", { width: C.W, height: C.H, viewBox: "0 0 " + C.W + " " + C.H }, v.cv);
     var gid = "ha-glow-" + n;
-    var filt = s("filter", { id: gid, filterUnits: "userSpaceOnUse", x: -2000, y: -2000, width: 6000, height: 6000 }, s("defs", {}, v.fg));
+    var filt = s("filter", { id: gid, filterUnits: "userSpaceOnUse", x: -2000, y: -2000, width: 6000, height: 6000 }, s("defs", {}, v.svg));
     s("feGaussianBlur", { stdDeviation: 2.5, result: "b" }, filt);
     var merge = s("feMerge", {}, filt);
     s("feMergeNode", { in: "b" }, merge);
     s("feMergeNode", { in: "SourceGraphic" }, merge);
     var glow = "url(#" + gid + ")";
 
-    function cube() {
-      var g = s("g", {}, v.fg);
+    v.traces = C.traces.map(function () {
+      return {
+        base: s("path", { pathLength: 1, fill: "none", stroke: ACCENT, "stroke-width": 1.5, "stroke-opacity": C.traceOp, "stroke-dasharray": "1 1" }, v.svg),
+        pulse: s("path", { pathLength: 1, fill: "none", stroke: INK, "stroke-width": 2.5, "stroke-linecap": "round", "stroke-dasharray": "0.05 1" }, v.svg)
+      };
+    });
+    v.nodes = C.nodes.map(function (p) {
+      return s("circle", { cx: p[0], cy: p[1], r: 5, fill: "none", stroke: ACCENT, "stroke-width": 1.5 }, v.svg);
+    });
+    v.cubes = C.cubes.map(function () {
+      var g = s("g", {}, v.svg);
       return {
         g: g,
         lines: CUBE_EDGES.map(function (e, k) {
@@ -168,10 +295,8 @@
         }),
         dots: [0, 1, 2, 3, 4, 5, 6, 7].map(function () { return s("circle", { fill: INK }, g); })
       };
-    }
-    v.cubes = [cube(), cube()];
-
-    v.mono = s("g", {}, v.fg);
+    });
+    v.mono = s("g", {}, v.svg);
     v.brackets = BRACKETS.map(function (b) {
       var sx = b[0], sy = b[1];
       return s("path", { d: "M" + sx * 170 + " " + sy * 105 + " H" + sx * 210 + " V" + sy * 140, pathLength: 1, fill: "none", stroke: ACCENT, "stroke-width": 2.5, "stroke-dasharray": "1 1" }, v.mono);
@@ -180,93 +305,117 @@
       return s("path", { d: st.d, pathLength: 1, fill: "none", stroke: st.col, "stroke-width": 7, "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-dasharray": "1 1", filter: glow }, v.mono);
     });
 
-    // HUD
-    v.boot = h("div", "ha-mono", v.el, 'SYS.BOOT <span style="color:' + ACCENT + '">//</span> HUSSEIN_ALSAADI');
-    v.clock = h("div", "ha-mono", v.el);
+    // HUD: pinned to the real screen edges
+    var HD = C.hud;
+    v.boot = hud(v.el, HD.boot, "ha-pill", 'SYS.BOOT <span style="color:' + ACCENT + '">//</span> HUSSEIN_ALSAADI');
+    v.clock = HD.clock ? hud(v.el, HD.clock, "ha-pill") : null;
     v.bar = h("div", "ha-bar", v.el);
     v.fill = h("div", "ha-fill", v.bar);
-    v.count = h("div", "ha-count", v.el);
-    v.status = h("span", null, v.count);
-    v.num = h("span", "ha-num", v.count);
+    v.count = hud(v.el, HD.count, "ha-count");
+    v.count.el.style.boxShadow = tl.shadow;
+    v.status = h("span", "ha-status", v.count.el);
+    v.status.style.fontSize = HD.count.statusFs;
+    v.num = h("span", "ha-num", v.count.el);
+    v.num.style.fontSize = HD.count.numFs;
 
-    // phrases
-    v.phrases = PHRASES.map(function (p, i) {
-      var wrap = h("div", "ha-phrase", v.el);
+    // kinetic phrases
+    var P = C.phrase;
+    v.cv2 = canvas(v.el, C);
+    v.phrases = C.phrases.map(function (lines, i) {
+      var a = CUES.Phrases + i * 1.6;
+      var wrap = h("div", "ha-phrase", v.cv2);
+      wrap.style.top = P.top + "px";
+      wrap.style.width = C.W + "px";
       var idx = h("div", "ha-idx", wrap, "0" + (i + 1) + " / 03");
-      var row = h("div", "ha-row", wrap);
-      var chars = p.text.split("").map(function (c) {
-        var sp = h("span", null, row);
-        sp.textContent = c === " " ? " " : c;
-        if (c === "&") sp.style.color = ACCENT;
-        sp._space = c === " ";
-        return sp;
+      var pill = h("div", "ha-ph ha-pill", wrap);
+      Object.assign(pill.style, { padding: P.pad, borderRadius: P.radius + "px", fontSize: P.fs + "px", letterSpacing: P.ls, lineHeight: P.lh });
+      var chars = [];
+      lines.forEach(function (ln) {
+        var row = h("div", "ha-row", pill);
+        ln.split("").forEach(function (c) {
+          var sp = h("span", null, row);
+          sp.textContent = c === " " ? " " : c;
+          if (c === "&") sp.style.color = ACCENT;
+          if (c === " " && P.space) sp.style.width = P.space + "px";
+          chars.push(sp);
+        });
       });
-      return { p: p, wrap: wrap, idx: idx, row: row, chars: chars, w: 0 };
+      return { a: a, b: a + 1.6, wrap: wrap, idx: idx, pill: pill, chars: chars };
     });
     return v;
   }
 
-  var views = [buildView(0), buildView(1)];
-  var flash = h("div", "ha-flash", root);
-  var skip = h("button", "ha-skip", root, "SKIP INTRO →");
-  skip.type = "button";
+  function build(key) {
+    views.forEach(function (v) { if (v.el.parentNode) v.el.parentNode.removeChild(v.el); });
+    compKey = key;
+    views = [buildView(0, DESIGN[key]), buildView(1, DESIGN[key])];
+  }
 
   /* ---------- Layout ---------- */
-  var L = {};
-  function measurePhrases(v) {
-    v.phrases.forEach(function (ph) {
-      var prev = ph.wrap.style.display;
-      ph.wrap.style.display = "flex";
-      ph.wrap.style.visibility = "hidden";
-      ph.row.style.fontSize = "112px";
-      ph.chars.forEach(function (c) { if (c._space) c.style.width = "34px"; });
-      ph.w = ph.row.scrollWidth || ph.row.offsetWidth;
-      ph.wrap.style.display = prev;
-      ph.wrap.style.visibility = "";
-    });
+  // push a trace's open end out to the real screen edge
+  function extendTrace(d, C, ex, ey) {
+    var m = /^M(-?[\d.]+) (-?[\d.]+)(.*)$/.exec(d);
+    var x = +m[1], y = +m[2];
+    if (x === 0) x = -ex; else if (x === C.W) x = C.W + ex;
+    if (y === 0) y = -ey; else if (y === C.H) y = C.H + ey;
+    return "M" + x + " " + y + m[3];
+  }
+  function place(item, hs) {
+    var p = item.spec, st = item.box.style;
+    st.left = st.right = st.top = st.bottom = "";
+    if (p.h === "l") { st.left = p.x * hs + "px"; st.justifyContent = "flex-start"; }
+    else if (p.h === "r") { st.right = p.x * hs + "px"; st.justifyContent = "flex-end"; }
+    else { st.left = "0"; st.right = "0"; st.justifyContent = "center"; }
+    if (p.v === "t") st.top = p.y * hs + "px"; else st.bottom = p.y * hs + "px";
+    item.el.style.transformOrigin = (p.h === "l" ? "left" : p.h === "r" ? "right" : "center") + " " + (p.v === "t" ? "top" : "bottom");
+    item.el.style.transform = "scale(" + hs + ")";
   }
   function layout() {
-    var vw = window.innerWidth, vh = window.innerHeight;
-    // u: design-px scale for centred content; equals 1 at 1920x1080
-    var u = Math.min(vw / 1100, vh / 1080);
-    var cover = Math.max(vw / 1920, vh / 1080);
-    L = { vw: vw, vh: vh, u: u };
-    var fs = function (px, min) { return Math.max(px * u, min) + "px"; };
+    // a window can report 0x0 for a moment while it opens: fall back so nothing divides by zero
+    var vw = window.innerWidth || document.documentElement.clientWidth || 1280;
+    var vh = window.innerHeight || document.documentElement.clientHeight || 720;
+    var key = vw < vh ? "m" : "d";
+    if (key !== compKey) build(key);
+    var C = DESIGN[key];
+    var sc = Math.min(vw / C.W, vh / C.H);          // design canvas -> screen
+    var hs = Math.max(sc, 10 / C.label);            // HUD scale: never below ~10px labels
+    var bw = vw / sc, bh = vh / sc;                 // viewport in design px
+    var ex = (bw - C.W) / 2, ey = (bh - C.H) / 2;   // bleed beyond the canvas
+    L = { vw: vw, vh: vh, s: sc, hs: hs, bw: bw, bh: bh, ex: ex, ey: ey, C: C };
 
-    views.forEach(function (v, vi) {
-      v.bg.style.transform = "scale(" + cover + ")";
-      var w = vw / u, hh = vh / u;
-      v.fg.setAttribute("width", vw);
-      v.fg.setAttribute("height", vh);
-      v.fg.setAttribute("viewBox", (960 - w / 2) + " " + (540 - hh / 2) + " " + w + " " + hh);
-
-      var edge = Math.max(96 * u, 18), top = Math.max(80 * u, 22);
-      Object.assign(v.boot.style, { left: edge + "px", top: top + "px", fontSize: fs(24, 10), letterSpacing: ".2em" });
-      Object.assign(v.clock.style, { right: edge + "px", top: top + "px", fontSize: fs(24, 10), letterSpacing: ".2em", display: vw < 640 ? "none" : "" });
-      Object.assign(v.count.style, { right: edge + "px", bottom: Math.max(84 * u, 30) + "px", gap: 28 * u + "px" });
-      Object.assign(v.status.style, { fontSize: fs(24, 10), letterSpacing: ".3em" });
-      v.num.style.fontSize = fs(88, 34);
-      var barX = 160 * (vw / 1920);
-      Object.assign(v.bar.style, { left: barX + "px", right: barX + "px", bottom: Math.max(70 * u, 22) + "px" });
-
-      if (vi === 0) measurePhrases(v);
-      v.phrases.forEach(function (ph, i) {
-        var w112 = views[0].phrases[i].w || 1;
-        var ps = Math.min(u, (vw * 0.92) / w112);
-        ph.ps = ps;
-        ph.wrap.style.top = (vh / 2 + 50 * u) + "px";
-        ph.wrap.style.gap = 28 * u + "px";
-        ph.idx.style.fontSize = fs(24, 10);
-        ph.row.style.fontSize = 112 * ps + "px";
-        ph.chars.forEach(function (c) { if (c._space) c.style.width = 34 * ps + "px"; });
+    views.forEach(function (v) {
+      Object.assign(v.bleed.style, {
+        width: bw + "px", height: bh + "px", marginLeft: -bw / 2 + "px", marginTop: -bh / 2 + "px",
+        transform: "scale(" + sc + ")"
       });
+      v.grid.style.backgroundPosition = (ex % 60) + "px " + (ey % 60) + "px";
+      v.cv.style.transform = v.cv2.style.transform = "scale(" + sc + ")";
+      v.traces.forEach(function (tr, i) {
+        var d = extendTrace(C.traces[i], C, ex, ey);
+        tr.base.setAttribute("d", d);
+        tr.pulse.setAttribute("d", d);
+      });
+      place(v.boot, hs);
+      if (v.clock) { place(v.clock, hs); v.clock.box.style.display = vw < 640 ? "none" : "flex"; }
+      place(v.count, hs);
+      Object.assign(v.bar.style, { left: C.hud.bar.x * hs + "px", right: C.hud.bar.x * hs + "px", bottom: C.hud.bar.y * hs + "px" });
     });
-    skip.style.left = Math.max(96 * u, 18) + "px";
-    skip.style.bottom = Math.max(84 * u, 30) + "px";
+
+    // skip button: bottom-left on landscape; centred under the boot pill on phones
+    if (C.hud.skip) {
+      Object.assign(skip.style, { left: Math.max(C.hud.skip.x * hs, 18) + "px", right: "auto", top: "auto", bottom: Math.max(C.hud.skip.y * hs, 30) + "px", margin: "0", width: "auto" });
+    } else {
+      var b = C.hud.boot;
+      Object.assign(skip.style, {
+        left: "0", right: "0", bottom: "auto", margin: "0 auto", width: "max-content",
+        top: Math.round(b.y * hs + views[0].boot.el.offsetHeight * hs + 14) + "px"
+      });
+    }
   }
+  function onResize() { layout(); render(T); }
   layout();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
-  window.addEventListener("resize", layout);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  window.addEventListener("resize", onResize);
 
   /* ---------- Render ---------- */
   function renderCube(c, T, cx, cy, r, draw, op, spin) {
@@ -296,9 +445,11 @@
   }
 
   function renderView(v, T) {
-    // grid spreads out from the centre
-    var gr = pr(T, 0, 3.2, E.outCubic) * 1500;
-    var mask = "radial-gradient(circle at 50% 50%, #000 " + Math.max(gr - 500, 0) + "px, transparent " + gr + "px)";
+    var C = v.C;
+
+    // grid spreads out from the centre of the canvas
+    var gr = pr(T, 0, 3.2, E.outCubic) * C.gridR;
+    var mask = "radial-gradient(circle at " + L.bw / 2 + "px " + (L.ey + C.gridCy) + "px, #000 " + Math.max(gr - 500, 0) + "px, transparent " + gr + "px)";
     css1(v.grid, "webkitMaskImage", mask);
     css1(v.grid, "maskImage", mask);
 
@@ -310,40 +461,48 @@
     });
     v.nodes.forEach(function (n, i) { att(n, "stroke-opacity", 0.2 + 0.4 * pr(T, 1.8 + i * 0.1, 2.3 + i * 0.1)); });
 
-    // monogram shrinks up as the phrases arrive
+    // monogram + tile shrink up as the phrases arrive
     var shrink = pr(T, CUES.Phrases - 0.4, CUES.Phrases + 0.5, MOTION.draw);
-    var iScale = 1 - shrink * 0.6, iY = 540 - shrink * 210;
-    renderCube(v.cubes[0], T, 960, iY, 250 - shrink * 130, pr(T, 0.4, 2.6, E.inOutSine), 0.9 - shrink * 0.2, 1);
-    renderCube(v.cubes[1], T, 960, iY, 140 - shrink * 75, pr(T, 1.0, 3.0, E.inOutSine), 0.5, -1.4);
-    att(v.mono, "transform", "translate(960 " + iY + ") scale(" + iScale + ")");
+    var iScale = 1 - shrink * C.shrinkS, iY = C.cy - shrink * C.shrinkY;
+    css1(v.tile, "opacity", String(pr(T, 0.2, 1.4)));
+    css1(v.tile, "transform", "translateY(" + (iY - C.cy) + "px) scale(" + iScale + ")");
+    C.cubes.forEach(function (cc, i) {
+      renderCube(v.cubes[i], T, C.W / 2, iY, cc.r - shrink * cc.k, pr(T, cc.a, cc.b, E.inOutSine), cc.op - shrink * cc.opK, cc.spin);
+    });
+    att(v.mono, "transform", "translate(" + C.W / 2 + " " + iY + ") scale(" + iScale * C.monoK + ")");
     v.brackets.forEach(function (b, i) { att(b, "stroke-dashoffset", 1 - pr(T, BRACKETS[i][2], BRACKETS[i][2] + 0.9, MOTION.draw)); });
     v.strokes.forEach(function (p, i) { att(p, "stroke-dashoffset", 1 - pr(T, STROKES[i].a, STROKES[i].b, MOTION.draw)); });
 
     // HUD
     var cnt = Math.floor(100 * pr(T, 0.3, 4.1, E.inOutCubic));
     var done = cnt >= 100;
-    css1(v.boot, "opacity", String(0.7 * pr(T, 0.2, 0.8)));
-    css1(v.clock, "opacity", String(0.45 * pr(T, 0.2, 0.8)));
-    txt(v.clock, ("00" + T.toFixed(2)).slice(-5) + "s");
+    var hudIn = String(pr(T, 0.2, 0.8));
+    css1(v.boot.el, "opacity", hudIn);
+    if (v.clock) {
+      css1(v.clock.el, "opacity", hudIn);
+      txt(v.clock.el, ("00" + T.toFixed(2)).slice(-5) + "s");
+    }
     txt(v.status, done ? "READY" : "LOADING");
     css1(v.status, "color", done ? ACCENT : INK);
     css1(v.status, "opacity", String(done ? 0.65 + 0.35 * Math.sin(T * 6) : 0.6));
     txt(v.num, ("00" + cnt).slice(-3) + "%");
-    css1(v.fill, "width", cnt + "%");
+    css1(v.fill, "transform", "scaleX(" + cnt / 100 + ")");
 
     // kinetic phrases
-    v.phrases.forEach(function (ph, n) {
-      var a = ph.p.a, b = ph.p.b;
+    var ty = C.phrase.ty;
+    v.phrases.forEach(function (ph) {
+      var a = ph.a, b = ph.b;
       if (T < a - 0.05 || T > b + 0.05) { css1(ph.wrap, "display", "none"); return; }
       css1(ph.wrap, "display", "flex");
-      css1(ph.idx, "opacity", String(pr(T, a, a + 0.3) * (1 - pr(T, b - 0.2, b, E.inQuart))));
-      var k = ph.ps;
+      var vis = String(pr(T, a, a + 0.3) * (1 - pr(T, b - 0.2, b, E.inQuart)));
+      css1(ph.idx, "opacity", vis);
+      css1(ph.pill, "opacity", vis);
       ph.chars.forEach(function (c, i) {
         var e = pr(T, a + i * 0.02, a + i * 0.02 + 0.5);
         var x = pr(T, b - 0.35 + i * 0.01, b - 0.05 + i * 0.01, E.inQuart);
         css1(c, "opacity", String(e * (1 - x)));
-        css1(c, "transform", "translateY(" + ((1 - e) * 70 - x * 70) * k + "px)");
-        css1(c, "filter", "blur(" + ((1 - e) * 10 + x * 10) * k + "px)");
+        css1(c, "transform", "translateY(" + ((1 - e) * ty - x * ty) + "px)");
+        css1(c, "filter", "blur(" + ((1 - e) * 10 + x * 10) + "px)");
       });
     });
   }
@@ -362,7 +521,7 @@
     }
     var sc = pr(T, CUES.Split, CUES.Split + 2, E.outQuart);
     pageEls.forEach(function (el) {
-      css1(el, "transform", "scale(" + (1.3 - 0.3 * sc) + ")");
+      css1(el, "transform", "scale(" + (calm ? 1 : 1.3 - 0.3 * sc) + ")");
       css1(el, "opacity", String(0.2 + 0.8 * sc));
     });
     if (held && T >= CUES.Split + 1.1) {
@@ -374,14 +533,17 @@
   /* ---------- Composite ---------- */
   function render(T) {
     var C = CUES.Split;
-    var split = T >= C - 0.1;
+    var split = !calm && T >= C - 0.1;
     var sp = pr(T, C, C + 1.9, E.inOutQuart);
-    var dy = sp * 600 * (L.vh / 1080), z = 1 + sp * 0.9;
+    var dy = sp * (L.C.dy / L.C.H) * L.vh, z = 1 + sp * 0.9;
     var fade = 1 - pr(T, C + 1.5, C + 1.9, E.inQuad);
 
     if (!split) {
       renderView(views[0], T);
+      css1(views[0].el, "display", "block");
       css1(views[0].el, "clipPath", "none");
+      css1(views[0].el, "transform", "none");
+      css1(views[0].el, "opacity", calm ? String(1 - pr(T, C, C + 1.2, E.inQuad)) : "1");   // calm: plain cross-fade
       css1(views[1].el, "display", "none");
     } else {
       views.forEach(function (v, i) {
@@ -393,7 +555,7 @@
         css1(v.el, "opacity", String(fade));
       });
     }
-    var fl = pr(T, C - 0.05, C + 0.35, E.outQuart) * (1 - pr(T, C + 0.35, C + 1.6, E.inQuart));
+    var fl = calm ? 0 : pr(T, C - 0.05, C + 0.35, E.outQuart) * (1 - pr(T, C + 0.35, C + 1.6, E.inQuart));
     css1(flash, "opacity", String(fl));
     css1(flash, "transform", "scaleX(" + (0.2 + 0.8 * fl) + ")");
     css1(skip, "opacity", String(1 - pr(T, C - 0.1, C + 0.3)));
@@ -407,7 +569,7 @@
     if (finished) return;
     finished = true;
     cancelAnimationFrame(raf);
-    window.removeEventListener("resize", layout);
+    window.removeEventListener("resize", onResize);
     document.removeEventListener("keydown", onKey);
     (pageEls || []).forEach(function (el) {
       el.style.transform = ""; el.style.opacity = ""; el.style.transformOrigin = "";
@@ -425,6 +587,7 @@
     raf = requestAnimationFrame(tick);
   }
   function skipToSplit() {
+    if (freezeAt != null) { finish(); return; }
     if (T < CUES.Split - 0.1) T = CUES.Split - 0.1;
     else finish();
   }
@@ -432,6 +595,11 @@
   skip.addEventListener("click", skipToSplit);
   document.addEventListener("keydown", onKey);
 
-  render(0);
-  raf = requestAnimationFrame(tick);
+  if (freezeAt != null) {
+    T = Math.min(freezeAt, END - 0.001);   // hold a single frame for design review
+    render(T);
+  } else {
+    render(0);
+    raf = requestAnimationFrame(tick);
+  }
 })();
