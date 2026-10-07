@@ -18,7 +18,7 @@ serve.mjs           Optional local preview server: node serve.mjs -> http://loca
 assets/
   person/           Portrait cutouts (waving, laptop)
   props/            Retro-tech decorative props (Game Boy, robot arm, cameras…)
-  projects/         (create this) your project screenshots for the lightbox
+  projects/         Project artwork for the cards + lightbox (illustrated mockups, one per project)
 ```
 
 ## Sections
@@ -48,12 +48,13 @@ opens a native `<dialog>` lightbox over a dark scrim. The arrow buttons, the Lef
 a swipe page through all five pictures (the caption follows the project, and it wraps around).
 **Esc**, the close button or a click on the dark area closes it.
 
-The pictures are placeholders for now. To use your own, put the files in `assets/projects/` and
-edit the `SHOTS` list at the top of the script at the bottom of `index.html`:
+The pictures are illustrated mockups drawn for each project (`assets/projects/*.svg`). To use a
+real screenshot instead, put the file in `assets/projects/` and point the `SHOTS` list (at the top
+of the script at the bottom of `index.html`) at it:
 
 ```js
 var SHOTS = {
-  "01": ["assets/projects/fuel-tank.jpg"],
+  "01": ["assets/projects/fuel-tank.jpg"],   // was fuel-tank.svg
   // a project with no entry simply has no cover (07 and 05 have none right now)
 };
 ```
